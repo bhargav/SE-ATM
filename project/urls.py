@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^user/cashwithdrawal/$', 'version1.views.cashwithdrawal'),
     url(r'^user/cashtransfer/$', 'version1.views.cashtransfer'),
     url(r'^user/pinchange/$', 'version1.views.pinchange'),
+    url(r'^user/changepin/$', 'version1.views.changepin'),
     url(r'^user/fastcash/$', 'version1.views.fastcash'),
     url(r'^admin/', include(admin.site.urls)),
 )

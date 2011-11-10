@@ -15,8 +15,15 @@ def index(request):
 def validatecard(request):
 	global session
 	p = get_object_or_404(Account_Ext, pk=request.GET['cardnumber'])
-	session = request.GET['cardnumber']
-	return render_to_response('version1/pincode.html', locals())
+	date=datetime.datetime.now()
+	[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.GET['cardnumber'],card_status=True)
+	if(cardcheck.expiry_date > date):
+		print cardcheck.expiry_date
+		print date
+		card=cardcheck
+		session = request.GET['cardnumber']
+		return render_to_response('version1/pincode.html', locals())
+	return HttpResponse("CARD IS EXPIRED")	
     
 def validatepin(request):
     #Account_holder_list = Account_Ext.objects.all()
@@ -43,6 +50,16 @@ def cashtransfer(request):
 
 def pinchange(request):
 	return render_to_response('version1/pinchange.html', locals())
+	
+def changepin(request):
+	global session
+	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
+	if(str(atmcard.pin)==request.GET['pincode'] and request.GET['newpincode']==request.GET['confirmpincode'] and request.GET['pincode']!=request.GET['confirmpincode'] and int(request.GET['confirmpincode'])>999):	
+		atmcard.pin=request.GET['newpincode']
+		atmcard.save()
+		return HttpResponse("Your pincode is changed")
+	else:	
+		return HttpResponse("Your pincode is not changed")
 	
 def fastcash(request):
 	return render_to_response('version1/fastcash.html', locals())
