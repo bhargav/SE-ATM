@@ -102,7 +102,7 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'project.urls'
 
-TEMPLATE_DIRS = ("/home/soni/Desktop/Software/SE-ATM/project/templates",
+TEMPLATE_DIRS = ("templates",
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
