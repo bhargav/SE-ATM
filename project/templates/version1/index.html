@@ -1,0 +1,9 @@
+<center>{% if Account_holder_list %}
+    <form name="input" action="/user/validatecard/" method="get">
+    Card Number: <input type="text" name="cardnumber" />
+    <input type="submit" value="Submit" />
+    </form>
+{% else %}
+    <p>No account holders are available.</p>
+{% endif %}
+</center>

@@ -1,0 +1,9 @@
+<center>{% if p %}
+    <form name="input" action="/user/validatepin/" method="get">
+    PINCODE: <input type="password" name="pincode" />
+    <input type="submit" value="Submit" />
+    </form>
+{% else %}
+    <p>Not a valid CARD NUMBER.</p>
+{% endif %}
+</center>
