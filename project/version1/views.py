@@ -15,8 +15,15 @@ def index(request):
 def validatecard(request):
 	global session
 	p = get_object_or_404(Account_Ext, pk=request.GET['cardnumber'])
-	session = request.GET['cardnumber']
-	return render_to_response('version1/pincode.html', locals())
+	date=datetime.datetime.now()
+	[cardcheck] = ATM_Card.objects.filter(atmcard_num=request.GET['cardnumber'],card_status=True)
+	if(cardcheck.expiry_date > date):
+		print cardcheck.expiry_date
+		print date
+		card=cardcheck
+		session = request.GET['cardnumber']
+		return render_to_response('version1/pincode.html', locals())
+	return HttpResponse("CARD IS EXPIRED")	
     
 def validatepin(request):
     #Account_holder_list = Account_Ext.objects.all()
