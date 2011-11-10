@@ -4,7 +4,7 @@ from version1.models import ATM_Card
 from django.template import Context, loader
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404 
-session=0
+session=0;
 def index(request):
     Account_holder_list = Account_Ext.objects.all()
     return render_to_response('version1/index.html', locals())
