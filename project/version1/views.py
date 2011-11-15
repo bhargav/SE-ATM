@@ -6,11 +6,14 @@ from version1.models import Transaction
 from version1.models import Cash_Withdrawl
 from version1.models import Cash_Transfer
 from decimal import *
-from django.template import Context, loader
+from django.template import RequestContext, loader
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404 
+from django.shortcuts import render_to_response, get_object_or_404, redirect 
 import datetime
+from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_protect
 
+@csrf_protect
 def index(request):
     Account_holder_list = Account_Ext.objects.all()
     return render_to_response('version1/index.html', locals())
