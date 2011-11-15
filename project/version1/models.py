@@ -22,7 +22,6 @@ class MachineRefill(models.Model):
 	
 class Account_Ext(models.Model):
 	acc_num = models.BigIntegerField("Account Number",primary_key=True)
-	atmcard_num = models.BigIntegerField("ATM Card Number")
 	name = models.CharField("NAME",max_length=100)
 	phone_num = models.BigIntegerField("Phone NUMBER")
 	balance = models.DecimalField("Balance",decimal_places=2,max_digits=10)
@@ -30,7 +29,8 @@ class Account_Ext(models.Model):
 		return str(self.acc_num)
 	
 class ATM_Card(models.Model):
-	atmcard_num = models.ForeignKey(Account_Ext)
+	atmcard_num = models.BigIntegerField("ATM Card Number")
+	account_num = models.ForeignKey(Account_Ext)
 	name = models.CharField("NAME ON CARD",max_length=100)
 	pin = models.IntegerField("PIN", max_length=4)
 	date_of_issue = models.DateTimeField('DATE OF ISSUE')
