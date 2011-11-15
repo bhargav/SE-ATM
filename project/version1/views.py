@@ -35,26 +35,50 @@ def index(request):
 				return redirect('/user/validatepin/')
 	return render_to_response('finale/index.html')
 
-def validatecard(request):
-	global session
-	p = get_object_or_404(Account_Ext, pk=request.GET['cardnumber'])
-	date=datetime.datetime.now()
-	[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.GET['cardnumber'],card_status=True)
-	if(cardcheck.expiry_date > date):
-		print cardcheck.expiry_date
-		print date
-		card=cardcheck
-		session = request.GET['cardnumber']
-		return render_to_response('version1/pincode.html', locals())
-	return HttpResponse("CARD IS EXPIRED")	
-    
+@csrf_protect
 def validatepin(request):
-    #Account_holder_list = Account_Ext.objects.all()
-    global session
-    pin = ATM_Card.objects.filter(pin=request.GET['pincode'],atmcard_num=session)
-    if pin:
-		return render_to_response('version1/options.html', locals())	
-    return HttpResponse("Your pincode is not valid")
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' in request.session:
+		return redirect('/user/options/')
+		
+	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+	username = atmcard.name
+	request.session['username'] = username
+	
+	if request.method == 'POST':
+		cardpin = request.POST['pincode']
+		print cardpin, atmcard.pin
+		if int(atmcard.pin) == int(cardpin):
+			request.session['pinverified'] = True
+			return redirect('/user/options')
+		# Update the number of attempts accordingly
+		if 'pinattempt' not in request.session:
+			request.session['pinattempt'] = 1
+		else:
+			request.session['pinattempt'] = request.session['pinattempt'] + 1
+		
+		if request.session['pinattempt'] == 1:
+		# Message to be displayed
+				pinmessage = 1
+		elif request.session['pinattempt'] == 2:
+				pinmessage = 2
+		else:
+				pinmessage = 3
+				atmcard.card_status = False
+				atmcard.save()
+				request.session.flush()
+	return render_to_response('finale/pincode.html', locals())
+
+@csrf_protect
+def options(request):
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+		
+	username = request.session['username']
+	return render_to_response('finale/options.html', locals())
 
 def balanceenquiry(request):
 	global session

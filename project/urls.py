@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -14,8 +15,8 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     url(r'^user/$', 'version1.views.index'),
-    url(r'^user/validatecard/$', 'version1.views.validatecard'),
     url(r'^user/validatepin/$', 'version1.views.validatepin'),
+    url(r'^user/options/$', 'version1.views.options'),    
     url(r'^user/balanceenquiry/$', 'version1.views.balanceenquiry'),
     url(r'^user/cashwithdrawal/$', 'version1.views.cashwithdrawal'),
     url(r'^user/mcashwithdrawal/$', 'version1.views.mcashwithdrawal'),
@@ -27,3 +28,5 @@ urlpatterns = patterns('',
     url(r'^user/mfastcash/$', 'version1.views.mfastcash'),
     url(r'^admin/', include(admin.site.urls)),
 )
+
+urlpatterns += staticfiles_urlpatterns()
