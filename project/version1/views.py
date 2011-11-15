@@ -15,8 +15,25 @@ from django.views.decorators.csrf import csrf_protect
 
 @csrf_protect
 def index(request):
-    Account_holder_list = Account_Ext.objects.all()
-    return render_to_response('version1/index.html', locals())
+	if 'cardnumber' in request.session:
+		return redirect('/user/validatepin/')
+		
+	if request.method == 'POST':
+		cardnum = request.POST['cardnumber']
+		card = ATM_Card.objects.filter(atmcard_num=cardnum)
+		if not card:
+			# There is no ATM card with that card number
+			return HttpResponse("Invalid Card")
+		elif not card[0].card_status:
+			return HttpResponse("Blocked")
+		else:
+			date = datetime.datetime.now()
+			if(card[0].expiry_date < date):
+				return HttpResponse("Expired")
+			else:
+				request.session['cardnumber'] = cardnum
+				return redirect('/user/validatepin/')
+	return render_to_response('finale/index.html')
 
 def validatecard(request):
 	global session
