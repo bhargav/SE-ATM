@@ -78,6 +78,9 @@ def mcashtransfer(request):
 def pinchange(request):
 	return render_to_response('version1/pinchange.html', locals())
 	
+def pinchange(request):
+	return render_to_response('version1/phonechange.html', locals())
+	
 def changepin(request):
 	global session
 	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
@@ -87,6 +90,16 @@ def changepin(request):
 		return HttpResponse("Your pincode is changed")
 	else:	
 		return HttpResponse("Your pincode is not changed")
+
+def changephone(request):
+	global session
+	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
+	#if(str(atmcard.pin)==request.GET['pincode'] and request.GET['newpincode']==request.GET['confirmpincode'] and request.GET['pincode']!=request.GET['confirmpincode'] and int(request.GET['confirmpincode'])>999):	
+	atmcard.phone_num=request.GET['phoneno']
+	atmcard.save()
+	return HttpResponse("Your phoneno is changed")
+	#else:	
+	#	return HttpResponse("Your pincode is not changed")
 	
 def fastcash(request):
 	return render_to_response('version1/fastcash.html', locals())

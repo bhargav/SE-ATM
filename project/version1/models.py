@@ -58,11 +58,17 @@ class Balance_Enquiry(Transaction):
 	def __unicode__(self):
 		return str(self.tid)
 		
+class Phone_change(Transaction):
+	prev_phone = models.BigIntegerField("PREVIOUS PHONE NO")
+	new_phone = models.BigIntegerField("NEW PHONE NO")
+	def __unicode__(self):
+		return str(self.tid)
+		
 class Pin_change(Transaction):
 	prev_pin = models.IntegerField("PREVIOUS PIN")
 	new_pin = models.IntegerField("NEW PIN")
 	def __unicode__(self):
-		return str(self.tid)
+		return str(self.tid)		
 	
 class Cash_Transfer(Transaction):
 	ben_acc_num = models.BigIntegerField("BENEFICIARY ACCOUNT NUMBER")
