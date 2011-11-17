@@ -6,6 +6,7 @@ from version1.models import Balance_Enquiry
 from version1.models import Cash_Transfer
 from version1.models import Cash_Withdrawl
 from version1.models import Pin_change
+from version1.models import Phone_change
 from django.contrib import admin
 
 admin.site.register(Machine)
@@ -16,3 +17,4 @@ admin.site.register(Balance_Enquiry)
 admin.site.register(Cash_Transfer)
 admin.site.register(Cash_Withdrawl)
 admin.site.register(Pin_change)
+admin.site.register(Phone_change)
