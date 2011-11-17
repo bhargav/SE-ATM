@@ -56,15 +56,12 @@ function IsNumeric(strString){
 </script>
 </head>
 <body>
-<center>{% if Account_holder_list %}
+<center>
     <form name="input" action="/user/validatecard/" <!--onsubmit="return validateForm() --> method="get">
     Card Number: <input type="text" name="cardnumber" id="cardnumber" onchange="validate(this.id)"/>
     <input type="submit" value="Submit" />
     </form>
     <p id="demo"></p>
-{% else %}
-    <p>No account holders are available.</p>
-{% endif %}
 </center>
 </body>
 </html>
