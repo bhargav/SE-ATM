@@ -1,0 +1,20 @@
+<html>
+<head>
+
+
+</head>
+<body>
+<center>{% if login %}
+   <h1>
+		WELCOME TO MANGI's BANK
+	</h1>
+	<a href = "/admin_user/add_new_card/"> Add a new card</a><br>
+	<a href = "/admin_user/ATM_status/"> View ATM machines status</a><br>
+	<a href = "/admin_user/update_card_details/"> Update card details</a><br>
+	
+{% else %}
+    <p>Login First </p>
+{% endif %}
+</center>
+</body>
+</html>

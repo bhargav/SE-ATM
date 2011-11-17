@@ -1,3 +1,4 @@
+from version1.models import Admin
 from version1.models import Machine
 from version1.models import MachineRefill
 from version1.models import Account_Ext
@@ -8,6 +9,7 @@ from version1.models import Cash_Withdrawl
 from version1.models import Pin_change
 from django.contrib import admin
 
+admin.site.register(Admin)
 admin.site.register(Machine)
 admin.site.register(MachineRefill)
 admin.site.register(Account_Ext)

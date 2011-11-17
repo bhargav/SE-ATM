@@ -1,0 +1,19 @@
+<html>
+<head>
+
+
+</head>
+<body>
+<center>{% if Admin_list %}
+    <form name="input" action="/admin_user/verify_user/" method="get">
+    Username: <input type="text" name="username" id="username" /><br>
+    Password: <input type="text" name="password" id="password" /><br>
+    <input type="submit" value="Submit" />
+    </form>
+    <p id="demo"></p>
+{% else %}
+    <p>No administrator is defined</p>
+{% endif %}
+</center>
+</body>
+</html>

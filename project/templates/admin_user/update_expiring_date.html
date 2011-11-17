@@ -1,0 +1,18 @@
+<html>
+<head>
+
+
+</head>
+<body>
+<center>{% if login %}
+    <form name="input" action="/admin_user/update_card_details/update_date_operation/" method="get">
+    New expiring date: <input type="text" name="date" id="date" /><br>
+    <input type="submit" value="Confirm" />
+    </form>
+    <p id="demo"></p>
+{% else %}
+    <p>Login first</p>
+{% endif %}
+</center>
+</body>
+</html>
