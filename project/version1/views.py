@@ -5,6 +5,7 @@ from version1.models import Balance_Enquiry
 from version1.models import Transaction
 from version1.models import Cash_Withdrawl
 from version1.models import Cash_Transfer
+from version1.models import *
 from decimal import *
 from django.template import RequestContext, loader
 from django.http import HttpResponse
@@ -149,31 +150,67 @@ def cashtransfer(request):
 	
 	return render_to_response('finale/cashtransfer.html', locals())
 
+@csrf_protect
 def pinchange(request):
-	return render_to_response('version1/pinchange.html', locals())
-	
-def pinchange(request):
-	return render_to_response('version1/phonechange.html', locals())
-	
-def changepin(request):
-	global session
-	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
-	if(str(atmcard.pin)==request.GET['pincode'] and request.GET['newpincode']==request.GET['confirmpincode'] and request.GET['pincode']!=request.GET['confirmpincode'] and int(request.GET['confirmpincode'])>999):	
-		atmcard.pin=request.GET['newpincode']
-		atmcard.save()
-		return HttpResponse("Your pincode is changed")
-	else:	
-		return HttpResponse("Your pincode is not changed")
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username = request.session['username']
+	if request.method == 'POST':
+		atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+		cardpin = request.POST['pincode']
+		npin = request.POST['npincode']
+		cpin = request.POST['cpincode']
+		if int(atmcard.pin) == int(cardpin):
+			if int(npin) == int(cpin):
+				if int(atmcard.pin) == int(cpin):
+					#same no need to do any thing
+					pcmessage=1
+				else:
+					#successfull
+					pcmessage=4
+					t = Pin_change(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_pin=cardpin,new_pin=npin)
+					t.save()
+					atmcard.pin=int(cpin)
+					atmcard.save() 
+						
+			else:
+				#new pin and confirm pin are different
+				pcmessage=2
+			
+		else:
+			#invalid pincode
+			pcmessage=3
+	return render_to_response('finale/pinchange.html', locals())
 
-def changephone(request):
-	global session
-	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
-	#if(str(atmcard.pin)==request.GET['pincode'] and request.GET['newpincode']==request.GET['confirmpincode'] and request.GET['pincode']!=request.GET['confirmpincode'] and int(request.GET['confirmpincode'])>999):	
-	atmcard.phone_num=request.GET['phoneno']
-	atmcard.save()
-	return HttpResponse("Your phoneno is changed")
-	#else:	
-	#	return HttpResponse("Your pincode is not changed")
+@csrf_protect	
+def phonechange(request):
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username = request.session['username']
+	if request.method == 'POST':
+		atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+		nphone = request.POST['nphone']
+		cphone = request.POST['cphone']
+		if int(nphone) == int(cphone):
+				if int(atmcard.phone_num) == int(cphone):
+					#same no need to do any thing
+					pcmessage=1
+				else:
+					#successfull
+					pcmessage=4
+					t = Phone_change(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_phone=atmcard.phone_num,new_phone=nphone)
+					t.save()
+					atmcard.phone_num=int(cphone)
+					atmcard.save() 
+						
+		else:
+			#new phoneno and confirm phoneno are different
+			pcmessage=2
+	return render_to_response('finale/phonechange.html', locals())
 
 @csrf_protect	
 def fastcash(request):
