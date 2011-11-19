@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     #url(r'^user/changephone/$', 'version1.views.changephone'),
     url(r'^user/fastcash/$', 'version1.views.fastcash'),
     url(r'^user/mfastcash/$', 'version1.views.mfastcash'),
+    url(r'^user/exit/$', 'version1.views.exit'),
     url(r'^admin/', include(admin.site.urls)),
 )
 

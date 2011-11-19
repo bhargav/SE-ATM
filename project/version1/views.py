@@ -76,7 +76,7 @@ def options(request):
 		return redirect('/user/pinvalidation/')
 	username = request.session['username']
 	return render_to_response('finale/options.html', locals())
-
+@csrf_protect
 def balanceenquiry(request):
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
@@ -89,7 +89,7 @@ def balanceenquiry(request):
 	bal = t_acc.balance
 	username=atmcard.name
 	return render_to_response('finale/balance.html', locals())
-	
+@csrf_protect	
 def cashwithdrawal(request):
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
@@ -163,3 +163,11 @@ def mfastcash(request):
 	ta = Cash_Withdrawl(atmcard_num_id = session, machine_id_id =1, date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(amount),cur_bal = t_acc.balance)
 	ta.save()
 	return render_to_response('version1/mcashwithdrawal.html', locals())
+@csrf_protect
+def exit(request):
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	request.session.flush()
+	return redirect('/user')

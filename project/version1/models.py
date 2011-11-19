@@ -155,7 +155,9 @@ class Phone_change(Transaction):
 						else:
 							if(len(str(self.new_phone))!=10):
 								raise Exception, "NEW PHONE NO SHOULD BE OF LENGTH 10"
-							else:			
+							else:
+								top = Phone_change.objects.order_by('-tid')[0]
+								self.tid = top.tid + 1			
 								super(Phone_change, self).save()		
 
 class Pin_change(Transaction):
@@ -181,7 +183,9 @@ class Pin_change(Transaction):
 						else:
 							if(len(str(self.new_pin))!=4):
 								raise Exception, "NEW PIN NO SHOULD BE OF LENGTH 4"
-							else:			
+							else:
+								top = Pin_change.objects.order_by('-tid')[0]
+								self.tid = top.tid + 1			
 								super(Pin_change, self).save()					
 	
 class Cash_Transfer(Transaction):
@@ -205,7 +209,9 @@ class Cash_Transfer(Transaction):
 					else:
 						if(self.amt_trans<=0):
 							raise Exception, "AMOUNT SHOULD BE NON ZERO POSITIVE"
-						else:	
+						else:
+							top = Cash_Transfer.objects.order_by('-tid')[0]
+							self.tid = top.tid + 1	
 							super(Cash_Transfer, self).save()			
 	
 class Cash_Withdrawl(Transaction):
@@ -229,5 +235,7 @@ class Cash_Withdrawl(Transaction):
 					else:
 						if(self.amt_with>self.cur_bal):
 							raise Exception, "WITHDRAWAL AMOUNT IS MORE THAN CURRENT BALANCE"
-						else:	
+						else:
+							top = Cash_Withdrawl.objects.order_by('-tid')[0]
+							self.tid = top.tid + 1	
 							super(Cash_Withdrawl, self).save()		
