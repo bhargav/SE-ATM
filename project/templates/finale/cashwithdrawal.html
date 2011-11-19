@@ -90,8 +90,19 @@
             {% endif %}  
               <p> Please enter the withdrawal amount press 'NEXT'</p>
               <div class="alert-message block-message info">
+              {% if wdmessage == 1 %}
+                <div class="alert-message success"><p> Your transaction is <strong>Succecfull</strong></p></div>
+                <script type="text/javascript">
+                $(document).ready(function() {
+                $('#amountform').hide();
+                window.setTimeout('location.reload()', 5000);
+                });
+				</script>
               
-              <form name="input" action="." method="post">{% csrf_token %}<label for="xlInput">Amount &nbsp;</label>
+              {% else %} {% if wdmessage == 2 %}
+              <div class="alert-message error"><p><strong>UNSUCCESFULL</strong>You donot have sufficient money</p></div>
+              {% endif %} {% endif %}
+              <form name="input" id="amountform" action="." method="post">{% csrf_token %}<label for="xlInput">Amount &nbsp;</label>
               <input type="text" class="span3" name="amount" id="amount"/>
               <div class="actionsNew">
 				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>	  
