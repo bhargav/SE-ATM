@@ -41,14 +41,12 @@ def validatepin(request):
 		return redirect('/user/')
 	if 'pinverified' in request.session:
 		return redirect('/user/options/')
-		
 	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
 	username = atmcard.name
 	request.session['username'] = username
 	
 	if request.method == 'POST':
 		cardpin = request.POST['pincode']
-		print cardpin, atmcard.pin
 		if int(atmcard.pin) == int(cardpin):
 			request.session['pinverified'] = True
 			return redirect('/user/options')
@@ -76,21 +74,29 @@ def options(request):
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
 		return redirect('/user/pinvalidation/')
-		
 	username = request.session['username']
 	return render_to_response('finale/options.html', locals())
 
 def balanceenquiry(request):
-	global session
-	[t_acc] = Account_Ext.objects.filter(atmcard_num=session)
-	#mach = Machine.objects.filter(machine_id =1)
-	t = Balance_Enquiry(atmcard_num_id = session, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 1,type_trans = "Balance Enquiry",bal_amount=t_acc.balance)
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')	
+	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+	t_acc = Account_Ext.objects.get(acc_num=str(atmcard.account_num))
+	t = Balance_Enquiry(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 1,type_trans = "Balance Enquiry",bal_amount=t_acc.balance)
 	t.save()
 	bal = t_acc.balance
-	return render_to_response('version1/balance.html', locals())
+	username=atmcard.name
+	return render_to_response('finale/balance.html', locals())
 	
 def cashwithdrawal(request):
-	return render_to_response('version1/cashwithdrawal.html', locals())
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username=request.session['username']
+	return render_to_response('finale/cashwithdrawal.html', locals())
 	
 def mcashwithdrawal(request):
 	global session

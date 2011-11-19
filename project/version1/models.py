@@ -104,7 +104,7 @@ class ATM_Card(models.Model):
 			raise Exception, "ATM CARD NO. SHOULD BE NON ZERO POSITIVE"	
 	
 class Transaction(models.Model):
-	atmcard_num = models.ForeignKey(Account_Ext)
+	atmcard_num = models.ForeignKey(ATM_Card)
 	machine_id = models.ForeignKey(Machine)
 	tid = models.IntegerField("TRANSACTION ID",primary_key=True)
 	date_time = models.DateTimeField("DATE TIME OF TRANSACTION")
@@ -128,7 +128,9 @@ class Balance_Enquiry(Transaction):
 				if(self.bal_amount<0):
 					raise Exception, "BALANCE AMOUNT SHOULD BE POSITIVE"
 				else:			
-					super(Balance_Enquiry, self).save()	
+					top = Balance_Enquiry.objects.order_by('-tid')[0]
+					self.tid = top.tid + 1
+					super(Balance_Enquiry, self).save()
 		
 class Phone_change(Transaction):
 	prev_phone = models.BigIntegerField("PREVIOUS PHONE NO")
