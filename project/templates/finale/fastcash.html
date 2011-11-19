@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 150px;
+        padding-left : 60px;
         padding-bottom: 0px;
       }
       
@@ -72,7 +72,8 @@
       }
       
     </style>
-    
+    <script type="text/javascript" src="/static/js/jquery.min.js">
+    </script>
   </head>
   
   <body>
@@ -83,31 +84,35 @@
           </div>
           <div class="row">
             <div class="span10">
-              {% if username %}
+            {% if username %}
               <h3>Hello {{ username }} !</h3>
             {% else %}
               <h3>Hello user !</h3>
-            {% endif %}  
-              <p> Please enter the withdrawal amount press 'NEXT'</p>
+            {% endif %}
+              <p> Please choose the amount</p>
               <div class="well">
-              {% if wdmessage == 1 %}
+              {% if fcmessage == 1 %}
               <div class="alert-message success"><p><strong>Your Transaction is SUCCESSFULL!</strong></p></div>
               <script type="text/javascript">
               $(document).ready(function() {
-                $('#amount').hide();
+                $('#fastcash').hide();
                 window.setTimeout('location.reload()', 5000);
                 });
                </script> 
-              {% else %} {% if wdmessage == 2 %}
-              <div class="alert-message error"><p><strong>UNSUCCESFULL!! </strong>You donot have sufficient money</p></div>
+              {% else %} {% if fcmessage == 2 %}
+              <div class="alert-message error"><p><strong>Transaction UNSUCCESSFULL!!</strong> You donot have enough money</p></div>
               {% endif %} {% endif %}
-              <form name="input" id="amount" action="." method="post">{% csrf_token %}<label for="xlInput">Amount &nbsp;</label>
-              <input type="text" class="span3" name="amount" id="amount"/>
+              <form name="fastcash" id="fastcash" action="." method="post">{% csrf_token %}
+              1000  <input type = "radio" name = "fcash" value = "1000" id = "fcash"/>
+			  2000  <input type = "radio" name = "fcash" value = "2000" id = "fcash"/>
+		      5000  <input type = "radio" name = "fcash" value = "5000" id = "fcash"/>
+		      10000 <input type = "radio" name = "fcash" value = "10000" id = "fcash"/>
               <div class="actionsNew">
-				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>	  
-				<input type="submit" class="btn primary disabled" value="NEXT" />
+				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>  
+                <input type="submit" class="btn primary disabled" value="NEXT" />
               </div>
               </form>
+
               </div>
             </div>
             <div class="span4">

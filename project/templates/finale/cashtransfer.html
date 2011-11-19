@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 150px;
+        padding-left : 95px;
         padding-bottom: 0px;
       }
       
@@ -72,7 +72,8 @@
       }
       
     </style>
-    
+    <script type="text/javascript" src="/static/js/jquery.min.js">
+    </script>
   </head>
   
   <body>
@@ -83,31 +84,46 @@
           </div>
           <div class="row">
             <div class="span10">
-              {% if username %}
+            {% if username %}
               <h3>Hello {{ username }} !</h3>
             {% else %}
               <h3>Hello user !</h3>
-            {% endif %}  
-              <p> Please enter the withdrawal amount press 'NEXT'</p>
+            {% endif %}
+              <p> Please enter the Cash Transfer Details</p>
               <div class="well">
-              {% if wdmessage == 1 %}
+              
+              {% if ctmessage == 0 %}
+                <div class="alert-message warning"><p><strong>There is no such Account holder</strong></p></div>
+              {% else %} {% if ctmessage == 1 %}
               <div class="alert-message success"><p><strong>Your Transaction is SUCCESSFULL!</strong></p></div>
               <script type="text/javascript">
-              $(document).ready(function() {
-                $('#amount').hide();
+                $(document).ready(function() {
+                $('#cashform').hide();
                 window.setTimeout('location.reload()', 5000);
                 });
-               </script> 
-              {% else %} {% if wdmessage == 2 %}
-              <div class="alert-message error"><p><strong>UNSUCCESFULL!! </strong>You donot have sufficient money</p></div>
-              {% endif %} {% endif %}
-              <form name="input" id="amount" action="." method="post">{% csrf_token %}<label for="xlInput">Amount &nbsp;</label>
-              <input type="text" class="span3" name="amount" id="amount"/>
+              </script>
+              {% else %} {% if ctmessage == 2 %}
+              <div class="alert-message error"><p><strong>Transaction UNSUCCESSFULL!!</strong> You donot have enough money</p></div>
+              <script type="text/javascript">
+                $(document).ready(function() {
+                $('#cashform').hide();
+                window.setTimeout('location.reload()', 5000);
+                });
+              </script>
+              {% endif %} {% endif %} {% endif %}
+              <form name="cashform" id="cashform" action="." method="post">{% csrf_token %}
+              <label for="xlInput"> Name &nbsp;</label>
+              <input type="text" class="span2" name="name" id="name"/><p></p>
+              <label for="xlInput"> Account Number &nbsp;</label>
+              <input type="text" class="span2" name="acc_num" id="acc_num"/><p></p>
+              <label for="xlInput"> Amount &nbsp;</label>
+              <input type="text" class="span2" name="amount" id="amount"/>
               <div class="actionsNew">
-				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>	  
-				<input type="submit" class="btn primary disabled" value="NEXT" />
+				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>  
+                <input type="submit" class="btn primary disabled" value="NEXT" />
               </div>
               </form>
+
               </div>
             </div>
             <div class="span4">
