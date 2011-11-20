@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 165px;
+        padding-left : 95px;
         padding-bottom: 0px;
       }
       
@@ -89,25 +89,34 @@
             {% else %}
               <h3>Hello user !</h3>
             {% endif %}  
-              <p> Please enter your 4 digit pin ATM Card Pin Code and press 'NEXT'</p>
+              <p> Please enter your new phoneno to change it</p>
               <div class="well">
-              
-              {% if pinmessage == 1 %}
-                <div class="alert-message info"><p><strong>INVALID PIN!</strong> You have entered an invalid pincode</p></div>
-              {% else %} {% if pinmessage == 2 %}
-              <div class="alert-message warning"><p><strong>INVALID PIN!</strong> You have entered invalid pincode <strong>2</strong> times. Entering an invalid pincode once more will block the ATM Card</p></div>
-              {% else %} {% if pinmessage == 3 %}
-              <div class="alert-message error"><p><strong>INVALID PINCODE ATTEMPTS</strong> You have entered invalid pincode <strong>3</strong> times. <strong> Your ATM card has been blocked for further transactions. Please contact the XYZ BANK regarding the issue</strong></p></div>
-              <script type="text/javascript">
+			  {% if pcmessage == 4 %}
+                <div class="alert-message success"><p><strong>Your transaction is SUCCESFULL!</strong></p></div>	  
+				<script type="text/javascript">
                 $(document).ready(function() {
-                $('#pinform').hide();
-                window.setTimeout('location.reload()', 5000);
+                $('#pcform').hide();
+                window.setTimeout("location.href='/user/options/'", 5000);
                 });
               </script>
-              {% endif %} {% endif %} {% endif %}
-              <form name="input" id="pinform" action="." method="post">{% csrf_token %}<label for="xlInput">4 - Digit PIN Code &nbsp;</label>
-              <input type="text" class="span2" name="pincode" id="pincode"/>
+              {% else %} {% if pcmessage == 1 %}
+                <div class="alert-message warning"><p><strong>Your current phoneno and new phone are SAME</strong></p></div>
+                <script type="text/javascript">
+                $(document).ready(function() {
+                $('#pcform').hide();
+                window.setTimeout("location.href='/user/options/'", 5000);
+                });
+              </script>
+              {% else %} {% if pcmessage == 2 %}
+              <div class="alert-message warning"><p><strong>Your new phoneno and confirm phoneno are DIFFERENT!!</strong></p></div>
+              {% endif %} {% endif %}{% endif %}
+              <form name="input" id="pcform" action="." method="post">{% csrf_token %}
+              <label for="xlInput">New Phone NO. &nbsp;</label>
+              <input type="text" class="span2" name="nphone" id="nphone"/><p></p>
+              <label for="xlInput">Confirm Phone NO. &nbsp;</label>
+              <input type="text" class="span2" name="cphone" id="cphone"/><p></p>
               <div class="actionsNew">
+				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>   
                 <input type="submit" class="btn primary disabled" value="NEXT" />
               </div>
               </form>

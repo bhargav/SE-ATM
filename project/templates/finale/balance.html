@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 165px;
+        padding-left : 40px;
         padding-bottom: 0px;
       }
       
@@ -89,29 +89,14 @@
             {% else %}
               <h3>Hello user !</h3>
             {% endif %}  
-              <p> Please enter your 4 digit pin ATM Card Pin Code and press 'NEXT'</p>
-              <div class="well">
               
-              {% if pinmessage == 1 %}
-                <div class="alert-message info"><p><strong>INVALID PIN!</strong> You have entered an invalid pincode</p></div>
-              {% else %} {% if pinmessage == 2 %}
-              <div class="alert-message warning"><p><strong>INVALID PIN!</strong> You have entered invalid pincode <strong>2</strong> times. Entering an invalid pincode once more will block the ATM Card</p></div>
-              {% else %} {% if pinmessage == 3 %}
-              <div class="alert-message error"><p><strong>INVALID PINCODE ATTEMPTS</strong> You have entered invalid pincode <strong>3</strong> times. <strong> Your ATM card has been blocked for further transactions. Please contact the XYZ BANK regarding the issue</strong></p></div>
-              <script type="text/javascript">
-                $(document).ready(function() {
-                $('#pinform').hide();
-                window.setTimeout('location.reload()', 5000);
-                });
-              </script>
-              {% endif %} {% endif %} {% endif %}
-              <form name="input" id="pinform" action="." method="post">{% csrf_token %}<label for="xlInput">4 - Digit PIN Code &nbsp;</label>
-              <input type="text" class="span2" name="pincode" id="pincode"/>
+              <div class="alert-message block-message warning">
+			  <p> YOUR BALANCE IS <strong>{{bal}}</strong></p>  
               <div class="actionsNew">
-                <input type="submit" class="btn primary disabled" value="NEXT" />
+			  <button type="button" id="More" value="More" class="btn primary disabled" onclick="location.href='/user/options/'"> More </button>	  
+              <button type="button" id="Exit" value="Exit" class="btn primary disabled" onclick="location.href='/user/exit/'"> Exit </button>
               </div>
-              </form>
-
+              
               </div>
             </div>
             <div class="span4">

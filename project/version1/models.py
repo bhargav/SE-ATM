@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import *
 # Create your models here.
 class Machine(models.Model):
 	machine_id = models.IntegerField("MACHINE ID",primary_key=True)
@@ -104,7 +105,7 @@ class ATM_Card(models.Model):
 			raise Exception, "ATM CARD NO. SHOULD BE NON ZERO POSITIVE"	
 	
 class Transaction(models.Model):
-	atmcard_num = models.ForeignKey(Account_Ext)
+	atmcard_num = models.ForeignKey(ATM_Card)
 	machine_id = models.ForeignKey(Machine)
 	tid = models.IntegerField("TRANSACTION ID",primary_key=True)
 	date_time = models.DateTimeField("DATE TIME OF TRANSACTION")
@@ -112,7 +113,7 @@ class Transaction(models.Model):
 	rescode = models.IntegerField("RESPONSE CODE")
 	type_trans = models.CharField("TRANSACTION TYPE",max_length = 100)
 	class Meta:
-		abstract = True
+		abstract = True			
 
 class Balance_Enquiry(Transaction):
 	bal_amount = models.DecimalField("BALANCE AMOUNT",decimal_places=2,max_digits=10)
@@ -128,7 +129,19 @@ class Balance_Enquiry(Transaction):
 				if(self.bal_amount<0):
 					raise Exception, "BALANCE AMOUNT SHOULD BE POSITIVE"
 				else:			
-					super(Balance_Enquiry, self).save()	
+					count=0
+					for e in Balance_Enquiry.objects.all():
+						count=count+1
+					for e in Cash_Withdrawl.objects.all():
+						count=count+1	
+					for e in Cash_Transfer.objects.all():
+						count=count+1	
+					for e in Phone_change.objects.all():
+						count=count+1	
+					for e in Pin_change.objects.all():
+						count=count+1	
+					self.tid = count+1	
+					super(Balance_Enquiry, self).save()
 		
 class Phone_change(Transaction):
 	prev_phone = models.BigIntegerField("PREVIOUS PHONE NO")
@@ -153,7 +166,19 @@ class Phone_change(Transaction):
 						else:
 							if(len(str(self.new_phone))!=10):
 								raise Exception, "NEW PHONE NO SHOULD BE OF LENGTH 10"
-							else:			
+							else:
+								count=0
+								for e in Balance_Enquiry.objects.all():
+									count=count+1
+								for e in Cash_Withdrawl.objects.all():
+									count=count+1	
+								for e in Cash_Transfer.objects.all():
+									count=count+1	
+								for e in Phone_change.objects.all():
+									count=count+1	
+								for e in Pin_change.objects.all():
+									count=count+1	
+								self.tid = count+1			
 								super(Phone_change, self).save()		
 
 class Pin_change(Transaction):
@@ -179,7 +204,19 @@ class Pin_change(Transaction):
 						else:
 							if(len(str(self.new_pin))!=4):
 								raise Exception, "NEW PIN NO SHOULD BE OF LENGTH 4"
-							else:			
+							else:
+								count=0
+								for e in Balance_Enquiry.objects.all():
+									count=count+1
+								for e in Cash_Withdrawl.objects.all():
+									count=count+1	
+								for e in Cash_Transfer.objects.all():
+									count=count+1	
+								for e in Phone_change.objects.all():
+									count=count+1	
+								for e in Pin_change.objects.all():
+									count=count+1	
+								self.tid = count+1			
 								super(Pin_change, self).save()					
 	
 class Cash_Transfer(Transaction):
@@ -203,7 +240,19 @@ class Cash_Transfer(Transaction):
 					else:
 						if(self.amt_trans<=0):
 							raise Exception, "AMOUNT SHOULD BE NON ZERO POSITIVE"
-						else:	
+						else:
+							count=0
+							for e in Balance_Enquiry.objects.all():
+								count=count+1
+							for e in Cash_Withdrawl.objects.all():
+								count=count+1	
+							for e in Cash_Transfer.objects.all():
+								count=count+1	
+							for e in Phone_change.objects.all():
+								count=count+1	
+							for e in Pin_change.objects.all():
+								count=count+1	
+							self.tid = count+1	
 							super(Cash_Transfer, self).save()			
 	
 class Cash_Withdrawl(Transaction):
@@ -225,7 +274,16 @@ class Cash_Withdrawl(Transaction):
 					if(self.cur_bal<0):
 						raise Exception, "CURRENT BALANCE SHOULD BE ZERO OR POSITIVE"
 					else:
-						if(self.amt_with>self.cur_bal):
-							raise Exception, "WITHDRAWAL AMOUNT IS MORE THAN CURRENT BALANCE"
-						else:	
-							super(Cash_Withdrawl, self).save()		
+						count=0
+						for e in Balance_Enquiry.objects.all():
+							count=count+1
+						for e in Cash_Withdrawl.objects.all():
+							count=count+1	
+						for e in Cash_Transfer.objects.all():
+							count=count+1	
+						for e in Phone_change.objects.all():
+							count=count+1	
+						for e in Pin_change.objects.all():
+							count=count+1	
+						self.tid = count+1	
+						super(Cash_Withdrawl, self).save()		

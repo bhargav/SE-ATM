@@ -5,6 +5,7 @@ from version1.models import Balance_Enquiry
 from version1.models import Transaction
 from version1.models import Cash_Withdrawl
 from version1.models import Cash_Transfer
+from version1.models import *
 from decimal import *
 from django.template import RequestContext, loader
 from django.http import HttpResponse
@@ -41,14 +42,12 @@ def validatepin(request):
 		return redirect('/user/')
 	if 'pinverified' in request.session:
 		return redirect('/user/options/')
-		
 	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
 	username = atmcard.name
 	request.session['username'] = username
 	
 	if request.method == 'POST':
 		cardpin = request.POST['pincode']
-		print cardpin, atmcard.pin
 		if int(atmcard.pin) == int(cardpin):
 			request.session['pinverified'] = True
 			return redirect('/user/options')
@@ -76,84 +75,171 @@ def options(request):
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
 		return redirect('/user/pinvalidation/')
-		
 	username = request.session['username']
 	return render_to_response('finale/options.html', locals())
 
+@csrf_protect
 def balanceenquiry(request):
-	global session
-	[t_acc] = Account_Ext.objects.filter(atmcard_num=session)
-	#mach = Machine.objects.filter(machine_id =1)
-	t = Balance_Enquiry(atmcard_num_id = session, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 1,type_trans = "Balance Enquiry",bal_amount=t_acc.balance)
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')	
+	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+	t_acc = Account_Ext.objects.get(acc_num=str(atmcard.account_num))
+	t = Balance_Enquiry(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 1,type_trans = "Balance Enquiry",bal_amount=t_acc.balance)
 	t.save()
 	bal = t_acc.balance
-	return render_to_response('version1/balance.html', locals())
-	
+	username=atmcard.name
+	return render_to_response('finale/balance.html', locals())
+
+@csrf_protect	
 def cashwithdrawal(request):
-	return render_to_response('version1/cashwithdrawal.html', locals())
-	
-def mcashwithdrawal(request):
-	global session
-	t_acc = Account_Ext.objects.get(atmcard_num=session)
-	amount = request.GET['cw_amount']	
-	t_acc.balance = t_acc.balance - Decimal(amount)
-	t_acc.save()
-	ta = Cash_Withdrawl(atmcard_num_id = session, machine_id_id =1, date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(amount),cur_bal = t_acc.balance)
-	ta.save()
-	return render_to_response('version1/mcashwithdrawal.html', locals())
-	
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username=request.session['username']
+	if request.method == 'POST':
+		atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+		t_acc = Account_Ext.objects.get(acc_num=str(atmcard.account_num))
+		if(Decimal(t_acc.balance)>Decimal(request.POST['amount'])):
+			t_acc.balance = t_acc.balance - Decimal(request.POST['amount'])
+			t_acc.save()
+			t = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['amount']),cur_bal=t_acc.balance)
+			t.save()
+			wdmessage = 1
+			request.session.flush()
+		else:
+			ta = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 11,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['amount']),cur_bal = t_acc.balance)
+			ta.save()
+			wdmessage = 2
+	return render_to_response('finale/cashwithdrawal.html', locals())
+
+@csrf_protect	
 def cashtransfer(request):
-	return render_to_response('version1/cashtransfer.html', locals())
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username=request.session['username']
+	if request.method == 'POST':
+		accnum = request.POST['acc_num']
+		accname = request.POST['name']
+		print accnum
+		#acc_2 = Account_Ext.objects.get(acc_num=str(accnum),name=str(accname))
+		acc_2 = Account_Ext.objects.filter(acc_num=accnum,name=accname)
+		if not acc_2:
+			ctmessage = 0
+		else:
+			atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+			t_acc = Account_Ext.objects.get(acc_num=str(atmcard.account_num))
+			if(Decimal(t_acc.balance)>Decimal(request.POST['amount'])):
+				t_acc.balance = t_acc.balance - Decimal(request.POST['amount'])
+				t_acc.save()
+				acc_2[0].balance = acc_2[0].balance + Decimal(request.POST['amount'])
+				acc_2[0].save()
+				t = Cash_Transfer(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 3,type_trans = "Cash Transfer",amt_trans = Decimal(request.POST['amount']),ben_acc_num=accnum,ben_name=accname)
+				t.save()
+				ctmessage = 1
+				request.session.flush()
+			else:
+				ta = Cash_Transfer(atmcard_num_id = request.session['cardnumber'], machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 12,type_trans = "Cash Transfer",amt_trans = Decimal(request.POST['amount']),ben_acc_num=accnum,ben_name=accname)
+				ta.save()
+				ctmessage = 2
+				request.session.flush()		
+	
+	return render_to_response('finale/cashtransfer.html', locals())
 
-def mcashtransfer(request):
-	global session
-	amount = request.GET['ct_transfer']
-	accnum = request.GET['ACC_Num']
-	t_acc1 = Account_Ext.objects.get(atmcard_num=session)
-	t_acc2 = Account_Ext.objects.get(atmcard_num=int(accnum))
-	t_acc1.balance = t_acc1.balance - Decimal(amount)
-	t_acc2.balance = t_acc2.balance + Decimal(amount)
-	ta = Cash_Transfer(atmcard_num_id = session, machine_id_id =1, date_time = datetime.datetime.now(),status = "Completed",rescode = 3,type_trans = "Cash Withdrawal",ben_acc_num = int(accnum),ben_name = t_acc2.name,amt_trans = Decimal(amount))
-	ta.save()
-	t_acc1.save()
-	t_acc2.save()
-	return render_to_response('version1/mcashtransfer.html', locals())
-
+@csrf_protect
 def pinchange(request):
-	return render_to_response('version1/pinchange.html', locals())
-	
-def pinchange(request):
-	return render_to_response('version1/phonechange.html', locals())
-	
-def changepin(request):
-	global session
-	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
-	if(str(atmcard.pin)==request.GET['pincode'] and request.GET['newpincode']==request.GET['confirmpincode'] and request.GET['pincode']!=request.GET['confirmpincode'] and int(request.GET['confirmpincode'])>999):	
-		atmcard.pin=request.GET['newpincode']
-		atmcard.save()
-		return HttpResponse("Your pincode is changed")
-	else:	
-		return HttpResponse("Your pincode is not changed")
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username = request.session['username']
+	if request.method == 'POST':
+		atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+		cardpin = request.POST['pincode']
+		npin = request.POST['npincode']
+		cpin = request.POST['cpincode']
+		if int(atmcard.pin) == int(cardpin):
+			if int(npin) == int(cpin):
+				if int(atmcard.pin) == int(cpin):
+					#same no need to do any thing
+					pcmessage=1
+				else:
+					#successfull
+					pcmessage=4
+					t = Pin_change(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_pin=cardpin,new_pin=npin)
+					t.save()
+					atmcard.pin=int(cpin)
+					atmcard.save() 
+						
+			else:
+				#new pin and confirm pin are different
+				pcmessage=2
+			
+		else:
+			#invalid pincode
+			pcmessage=3
+	return render_to_response('finale/pinchange.html', locals())
 
-def changephone(request):
-	global session
-	[atmcard]=ATM_Card.objects.filter(atmcard_num=session)
-	#if(str(atmcard.pin)==request.GET['pincode'] and request.GET['newpincode']==request.GET['confirmpincode'] and request.GET['pincode']!=request.GET['confirmpincode'] and int(request.GET['confirmpincode'])>999):	
-	atmcard.phone_num=request.GET['phoneno']
-	atmcard.save()
-	return HttpResponse("Your phoneno is changed")
-	#else:	
-	#	return HttpResponse("Your pincode is not changed")
-	
+@csrf_protect	
+def phonechange(request):
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username = request.session['username']
+	if request.method == 'POST':
+		atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+		nphone = request.POST['nphone']
+		cphone = request.POST['cphone']
+		if int(nphone) == int(cphone):
+				if int(atmcard.phone_num) == int(cphone):
+					#same no need to do any thing
+					pcmessage=1
+				else:
+					#successfull
+					pcmessage=4
+					t = Phone_change(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_phone=atmcard.phone_num,new_phone=nphone)
+					t.save()
+					atmcard.phone_num=int(cphone)
+					atmcard.save() 
+						
+		else:
+			#new phoneno and confirm phoneno are different
+			pcmessage=2
+	return render_to_response('finale/phonechange.html', locals())
+
+@csrf_protect	
 def fastcash(request):
-	return render_to_response('version1/fastcash.html', locals())
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username=request.session['username']
+	if request.method == 'POST':
+		atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
+		t_acc = Account_Ext.objects.get(acc_num=str(atmcard.account_num))
+		if(Decimal(t_acc.balance)>Decimal(request.POST['fcash'])):
+			t_acc.balance = t_acc.balance - Decimal(request.POST['fcash'])
+			t_acc.save()
+			t = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['fcash']),cur_bal=t_acc.balance)
+			t.save()
+			fcmessage = 1
+			request.session.flush()
+		else:
+			ta = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 11,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['fcash']),cur_bal = t_acc.balance)
+			ta.save()
+			fcmessage = 2
+	return render_to_response('finale/fastcash.html', locals())
 	
-def mfastcash(request):
-	global session
-	t_acc = Account_Ext.objects.get(atmcard_num=session)
-	amount = request.GET['Fcash']	
-	t_acc.balance = t_acc.balance - Decimal(amount)
-	t_acc.save()
-	ta = Cash_Withdrawl(atmcard_num_id = session, machine_id_id =1, date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(amount),cur_bal = t_acc.balance)
-	ta.save()
-	return render_to_response('version1/mcashwithdrawal.html', locals())
+@csrf_protect
+def exit(request):
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	request.session.flush()
+	return redirect('/user')

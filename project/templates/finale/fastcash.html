@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 165px;
+        padding-left : 60px;
         padding-bottom: 0px;
       }
       
@@ -88,26 +88,27 @@
               <h3>Hello {{ username }} !</h3>
             {% else %}
               <h3>Hello user !</h3>
-            {% endif %}  
-              <p> Please enter your 4 digit pin ATM Card Pin Code and press 'NEXT'</p>
+            {% endif %}
+              <p> Please choose the amount</p>
               <div class="well">
-              
-              {% if pinmessage == 1 %}
-                <div class="alert-message info"><p><strong>INVALID PIN!</strong> You have entered an invalid pincode</p></div>
-              {% else %} {% if pinmessage == 2 %}
-              <div class="alert-message warning"><p><strong>INVALID PIN!</strong> You have entered invalid pincode <strong>2</strong> times. Entering an invalid pincode once more will block the ATM Card</p></div>
-              {% else %} {% if pinmessage == 3 %}
-              <div class="alert-message error"><p><strong>INVALID PINCODE ATTEMPTS</strong> You have entered invalid pincode <strong>3</strong> times. <strong> Your ATM card has been blocked for further transactions. Please contact the XYZ BANK regarding the issue</strong></p></div>
+              {% if fcmessage == 1 %}
+              <div class="alert-message success"><p><strong>Your Transaction is SUCCESSFULL!</strong></p></div>
               <script type="text/javascript">
-                $(document).ready(function() {
-                $('#pinform').hide();
+              $(document).ready(function() {
+                $('#fastcash').hide();
                 window.setTimeout('location.reload()', 5000);
                 });
-              </script>
-              {% endif %} {% endif %} {% endif %}
-              <form name="input" id="pinform" action="." method="post">{% csrf_token %}<label for="xlInput">4 - Digit PIN Code &nbsp;</label>
-              <input type="text" class="span2" name="pincode" id="pincode"/>
+               </script> 
+              {% else %} {% if fcmessage == 2 %}
+              <div class="alert-message error"><p><strong>Transaction UNSUCCESSFULL!!</strong> You donot have enough money</p></div>
+              {% endif %} {% endif %}
+              <form name="fastcash" id="fastcash" action="." method="post">{% csrf_token %}
+              1000  <input type = "radio" name = "fcash" value = "1000" id = "fcash"/>
+			  2000  <input type = "radio" name = "fcash" value = "2000" id = "fcash"/>
+		      5000  <input type = "radio" name = "fcash" value = "5000" id = "fcash"/>
+		      10000 <input type = "radio" name = "fcash" value = "10000" id = "fcash"/>
               <div class="actionsNew">
+				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>  
                 <input type="submit" class="btn primary disabled" value="NEXT" />
               </div>
               </form>
