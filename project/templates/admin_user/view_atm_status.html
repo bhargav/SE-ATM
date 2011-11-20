@@ -1,0 +1,45 @@
+<html>
+<head>
+
+
+</head>
+<body>
+<center>
+   <h1>
+		ATM Status 
+	</h1>
+	<table border="1">
+	<tr>
+		<td>S.no</td>
+		<td>Location</td>
+		<td>Minimum Balance</td>
+		<td>Current Balance</td>
+		<td>Last Refill Date</td>
+		<td>Next Maintainence Date</td>
+		<td>Reffil Now</td>
+	</tr>
+		
+	
+	{% for machine in Machine_list.all %}
+	<tr>
+		<td>{{ forloop.counter }}</td>
+		<td>{{ machine.location}}</td>
+		<td>{{machine.minimum_atm_balance}}</td>
+		<td>{{machine.current_balance}}</td>
+		<td>{{machine.last_refill_date}}</td>
+		<td>{{machine.next_maintainence_date}}</td>
+		<td><form action="/admin_user/update_refill/" method="get">
+			<input type="hidden" name="id" value="{{machine.machine_id}}">
+			<input type="submit" name="submit" value="update refill" /></td>
+	</tr>
+	
+		 	   
+			
+	{% endfor %}
+	</table>
+</form>
+
+
+</center>
+</body>
+</html>

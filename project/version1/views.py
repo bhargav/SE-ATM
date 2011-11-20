@@ -4,6 +4,7 @@ from version1.models import Account_Ext
 from version1.models import ATM_Card
 from version1.models import Balance_Enquiry
 from version1.models import Transaction
+from version1.models import Machine
 from version1.models import Cash_Withdrawl
 from version1.models import Cash_Transfer
 from decimal import *
@@ -37,7 +38,18 @@ def admin_add_card(request):
 ##################################### admin : atm status ##########################################
 def admin_atm_status(request):
 	global login
-	return render_to_response('admin_user/main_page.html', {"login":login})#locals())	
+	#[Machine]=Machine.objects.all()
+	Machine_list = Machine.objects.all()
+	return render_to_response('admin_user/view_atm_status.html', {"Machine_list":Machine_list})	
+	
+def admin_update_refill(request):
+	global login
+	[machine] =Machine.objects.filter(machine_id=request.GET['id'])
+	date_time = datetime.datetime.now()
+	machine.next_maintainence_date=date_time
+	machine.save()
+	Machine_list = Machine.objects.all()
+	return render_to_response('admin_user/view_atm_status.html', {"Machine_list":Machine_list})
 #################################### admin : update card details #####################################
 def admin_update_card_details(request):
 	global login
@@ -76,6 +88,27 @@ def admin_block_card(request):
 		return render_to_response('admin_user/enter_card_no.html', {"login":login})
 	
 def admin_block_card_operation(request):
+	global login
+	global admin_session
+	global admin_session_card
+	if (admin_session):
+		[cardcheck] =ATM_Card.objects.filter(atmcard_num=admin_session_card)
+		cardcheck.card_status=False
+		cardcheck.save()
+		return render_to_response('admin_user/update_card_details.html', {"login":login})
+	else:
+		return render_to_response('admin_user/enter_card_no.html', {"login":login})
+
+
+def admin_activate_card(request):
+	global login
+	global admin_session
+	if (admin_session):
+			return render_to_response('admin_user/activate_card.html', {"login":login})
+	else:
+		return render_to_response('admin_user/enter_card_no.html', {"login":login})
+	
+def admin_activate_card_operation(request):
 	global login
 	global admin_session
 	global admin_session_card

@@ -1,0 +1,16 @@
+<html>
+<head>
+
+</head>
+<body>
+<center>{% if login %}
+    <form name="input" action="/admin_user/update_card_details/activate_card_operation/"  method="get" <!--onsubmit="return validateForm()--> ><br>
+    <input type="submit" value="Confirm" />
+    </form>
+    <p id="demo"></p>
+{% else  %}
+    <p>Login first</p>
+{% endif %}
+</center>
+</body>
+</html>
