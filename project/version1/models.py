@@ -1,12 +1,23 @@
 from django.db import models
 from decimal import *
-# Create your models here.
+
+# Admin model stores the information of adiministrator. 
+# It has 2 fields
+# Admin_id -->char(100)
+# password -->char(100)
 class Admin(models.Model):
 	Admin_id = models.CharField("ADMIN ID",max_length=100,primary_key=True)
 	Password = models.CharField("PASSWORD",max_length=100)
 	def __unicode__(self):
 		return str(self.Admin_id)
 
+# Machine model stores the information of ATM_Machine 
+# It has 6 fields
+# location ---> Char(200)
+# minimum_atm_balance ---> Decimal
+# current_balance ----> Decimal
+# last_refill_date ----> DateTimeField
+# next_maintainence_date ----> DateTimeField
 class Machine(models.Model):
 	machine_id = models.IntegerField("MACHINE ID",primary_key=True)
 	location = models.CharField("LOCATION",max_length=200)
@@ -16,6 +27,7 @@ class Machine(models.Model):
 	next_maintainence_date = models.DateTimeField('NEXT MAINTAINENCE DATE')
 	def __unicode__(self):
 		return str(self.machine_id)
+
 	def save(self, *args, **kwargs):
 		if(self.machine_id<=0):
 			raise Exception, "MACHINE ID SHOULD BE NON ZERO POSITIVE"
@@ -27,7 +39,14 @@ class Machine(models.Model):
 					raise Exception, "BALANCE SHOULD BE POSITIVE"
 				else:			
 					super(Machine, self).save()
-					
+
+# MachineRefill model stores the information of refill for ATM machine. 
+# It has 5 fields
+# refill_id -->Integer
+# machine_id ---> ForeignKey of Machine
+# refill_date ---> DateTimeField
+# previous_balance ---> DecimalField
+# amount_refilled ----> Decimal
 class MachineRefill(models.Model):
 	refill_id = models.IntegerField("REFILL ID",primary_key=True)
 	machine_id = models.ForeignKey(Machine)
@@ -48,6 +67,13 @@ class MachineRefill(models.Model):
 				else:			
 					super(MachineRefill, self).save()	
 	
+# Account_Ext model stores the information of account with atm card information. 
+# It has 5 fields
+# acc_num = BigInteger
+# atmcard_num ---> BigInteger
+# name --> Char
+# phone_num --> BigInteger
+# balance --> Decimal
 class Account_Ext(models.Model):
 	acc_num = models.BigIntegerField("Account Number",primary_key=True)
 	name = models.CharField("NAME",max_length=100)
@@ -73,6 +99,17 @@ class Account_Ext(models.Model):
 		else:
 			raise Exception, "ACCOUNT NUMBER SHOULD BE NON ZERO POSITIVE"
 	
+# ATM_Card model stores the information of ATM cars 
+# It has 9 fields
+# atmcard_num ---> ForeignKey of Account_Ext
+# name ---> Char(100)
+# pin ---> Integer
+# date_of_issue ---> DateTimeField
+# expiry_date ---> DateTimeField
+# address --> Char(300)
+# two_factor ---> Boolean
+# phone_num ---> BigInteger
+# card_status ---> Boolean
 class ATM_Card(models.Model):
 	atmcard_num = models.BigIntegerField("ATM Card Number")
 	account_num = models.ForeignKey(Account_Ext)
@@ -86,6 +123,7 @@ class ATM_Card(models.Model):
 	card_status = models.BooleanField("CARD STATUS")
 	def __unicode__(self):
 		return str(self.atmcard_num)
+
 	def save(self, *args, **kwargs):
 		if(self.atmcard_num > 0):
 			if(len(str(self.atmcard_num)) == 4):
@@ -110,6 +148,16 @@ class ATM_Card(models.Model):
 		else:
 			raise Exception, "ATM CARD NO. SHOULD BE NON ZERO POSITIVE"	
 	
+
+# Transaction() is the abstract class which has sub-classes  
+# It has 7 fields
+# atmcard_num ---> ForeignKey of Account_Ext
+# machine_id ---> ForeignKey of Machine
+# tid ---> Integer
+# date_time ---> DateTimeField
+# status ---> Char(100)
+# rescode ---> Integer
+# type_trans ---> Char(100)
 class Transaction(models.Model):
 	atmcard_num = models.ForeignKey(ATM_Card)
 	machine_id = models.ForeignKey(Machine)
@@ -121,6 +169,9 @@ class Transaction(models.Model):
 	class Meta:
 		abstract = True			
 
+# Balance_Enquiry() is the inherited class of trasaction class
+# It has 1 fields
+# bal_amount ----> Decimal
 class Balance_Enquiry(Transaction):
 	bal_amount = models.DecimalField("BALANCE AMOUNT",decimal_places=2,max_digits=10)
 	def __unicode__(self):
@@ -187,6 +238,10 @@ class Phone_change(Transaction):
 								self.tid = count+1			
 								super(Phone_change, self).save()		
 
+# pin_change() is the inherited class of trasaction class
+# It has 2 fields
+# prev_pin ---> Integer
+# new_pin ---> Integer	
 class Pin_change(Transaction):
 	prev_pin = models.IntegerField("PREVIOUS PIN")
 	new_pin = models.IntegerField("NEW PIN")
@@ -225,6 +280,11 @@ class Pin_change(Transaction):
 								self.tid = count+1			
 								super(Pin_change, self).save()					
 	
+# Cash_Transfer() is the inherited class of trasaction class
+# It has 3 fields
+# ben_acc_num ---> BigInteger
+# ben_name ---> Char(100)
+# amt_trans ----> Decimal
 class Cash_Transfer(Transaction):
 	ben_acc_num = models.BigIntegerField("BENEFICIARY ACCOUNT NUMBER")
 	ben_name = models.CharField("BENEFICIARY NAME",max_length = 100)
@@ -261,6 +321,10 @@ class Cash_Transfer(Transaction):
 							self.tid = count+1	
 							super(Cash_Transfer, self).save()			
 	
+# Cash_Withdrawl() is the inherited class of trasaction class
+# It has 2 fields
+# amt_with ---> Decimal
+# cur_bal ---> Decimal
 class Cash_Withdrawl(Transaction):
 	amt_with = models.DecimalField("AMOUNT WITHDRAWN",decimal_places=2,max_digits=10)
 	cur_bal = models.DecimalField("CURRENT BALANCE",decimal_places=2,max_digits=10)
