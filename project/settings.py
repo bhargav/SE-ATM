@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'version1',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
+    'tastypie',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
