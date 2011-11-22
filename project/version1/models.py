@@ -287,3 +287,9 @@ class Cash_Withdrawl(Transaction):
 							count=count+1	
 						self.tid = count+1	
 						super(Cash_Withdrawl, self).save()		
+
+class Services(Transaction):
+	amount = models.DecimalField("AMOUNT PAID", decimal_places=2, max_digits=10)
+	service = models.CharField("SERVICE DETAILS", max_length = 100)
+	def __unicode__(self):
+		return str(self.tid)

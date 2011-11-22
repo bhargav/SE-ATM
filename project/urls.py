@@ -1,9 +1,15 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-
-# Uncomment the next two lines to enable the admin:
+from version1.api import *
+from tastypie.api import Api
 from django.contrib import admin
 admin.autodiscover()
+
+v1_api = Api(api_name='v1')
+v1_api.register(CashWithdrawalResource())
+v1_api.register(CashTransferResource())
+v1_api.register(ServicesResource())
+v1_api.register(ATMCardResource())
 
 urlpatterns = patterns('',
     # Examples:
@@ -26,6 +32,7 @@ urlpatterns = patterns('',
     url(r'^user/fastcash/$', 'version1.views.fastcash'),
     url(r'^user/exit/$', 'version1.views.exit'),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^api/', include(v1_api.urls)),
 )
 
 urlpatterns += staticfiles_urlpatterns()
