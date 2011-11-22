@@ -109,6 +109,9 @@
               </script>
               {% else %} {% if pcmessage == 2 %}
               <div class="alert-message warning"><p><strong>Your new phoneno and confirm phoneno are DIFFERENT!!</strong></p></div>
+              {% else %} {% if pcmessage == 5 %}
+              <div class="alert-message error"><p><strong>INVALID DATA!!</strong></p></div>
+              {% endif %}
               {% endif %} {% endif %}{% endif %}
               <form name="input" id="pcform" action="." method="post">{% csrf_token %}
               <label for="xlInput">New Phone NO. &nbsp;</label>

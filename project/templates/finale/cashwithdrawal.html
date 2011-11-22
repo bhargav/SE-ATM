@@ -101,7 +101,9 @@
                </script> 
               {% else %} {% if wdmessage == 2 %}
               <div class="alert-message error"><p><strong>UNSUCCESFULL!! </strong>You donot have sufficient money</p></div>
-              {% endif %} {% endif %}
+              {% else %} {% if wdmessage == 3 %}
+              <div class="alert-message error"><p><strong>UNSUCCESFULL!! </strong>INVALID DATA</p></div>
+              {% endif %} {% endif %}{% endif %}
               <form name="input" id="amount" action="." method="post">{% csrf_token %}<label for="xlInput">Amount &nbsp;</label>
               <input type="text" class="span3" name="amount" id="amount"/>
               <div class="actionsNew">

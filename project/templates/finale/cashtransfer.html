@@ -110,7 +110,15 @@
                 window.setTimeout('location.reload()', 5000);
                 });
               </script>
-              {% endif %} {% endif %} {% endif %}
+              {% else %} {% if ctmessage == 3 %}
+              <div class="alert-message error"><p><strong>INVALID DATA!!</strong></div>
+              <script type="text/javascript">
+                $(document).ready(function() {
+                $('#cashform').hide();
+                window.setTimeout('location.reload()', 5000);
+                });
+              </script>
+              {% endif %} {% endif %} {% endif %} {% endif %}
               <form name="cashform" id="cashform" action="." method="post">{% csrf_token %}
               <label for="xlInput"> Name &nbsp;</label>
               <input type="text" class="span2" name="name" id="name"/><p></p>

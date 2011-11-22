@@ -101,6 +101,9 @@
                </script> 
               {% else %} {% if fcmessage == 2 %}
               <div class="alert-message error"><p><strong>Transaction UNSUCCESSFULL!!</strong> You donot have enough money</p></div>
+               {% else %} {% if fcmessage == 3 %}
+              <div class="alert-message error"><p><strong>YOU HAVEN'T SELECTED ANY OPTION!!</strong></p></div>
+              {% endif %} 
               {% endif %} {% endif %}
               <form name="fastcash" id="fastcash" action="." method="post">{% csrf_token %}
               1000  <input type = "radio" name = "fcash" value = "1000" id = "fcash"/>

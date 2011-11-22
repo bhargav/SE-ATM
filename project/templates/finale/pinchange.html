@@ -117,7 +117,9 @@
                 window.setTimeout("location.href='/user/options/'", 5000);
                 });
               </script>
-              {% endif %} {% endif %} {% endif %}{% endif %}
+              {% else %} {% if pcmessage == 5 %}
+              <div class="alert-message error"><p><strong>INVALID DATA!!</strong></p></div>
+              {% endif %} {% endif %} {% endif %}{% endif %}{% endif %}
               <form name="input" id="pcform" action="." method="post">{% csrf_token %}<label for="xlInput">Current PIN Code &nbsp;</label>
               <input type="text" class="span2" name="pincode" id="pincode"/><p></p>
               <label for="xlInput">New PIN Code &nbsp;</label>
