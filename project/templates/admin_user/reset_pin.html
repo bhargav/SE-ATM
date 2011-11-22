@@ -1,0 +1,19 @@
+<html>
+<head>
+
+
+</head>
+<body>
+<center>{% if login %}
+    <form name="input" action="/admin_user/update_card_details/reset_pincode_operation/" method="get">
+    New Pincode: <input type="text" name="password1" id="password1" /><br>
+    Confirm New Pincode: <input type="text" name="password2" id="password2" /><br>
+    <input type="submit" value="Confirm" />
+    </form>
+    <p id="demo"></p>
+{% else %}
+    <p>Login First</p>
+{% endif %}
+</center>
+</body>
+</html>

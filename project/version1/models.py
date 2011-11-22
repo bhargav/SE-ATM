@@ -1,6 +1,12 @@
 from django.db import models
 from decimal import *
 # Create your models here.
+class Admin(models.Model):
+	Admin_id = models.CharField("ADMIN ID",max_length=100,primary_key=True)
+	Password = models.CharField("PASSWORD",max_length=100)
+	def __unicode__(self):
+		return str(self.Admin_id)
+
 class Machine(models.Model):
 	machine_id = models.IntegerField("MACHINE ID",primary_key=True)
 	location = models.CharField("LOCATION",max_length=200)
