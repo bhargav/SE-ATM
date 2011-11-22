@@ -1,10 +1,4 @@
 # Create your views here.
-from version1.models import Account_Ext
-from version1.models import ATM_Card
-from version1.models import Balance_Enquiry
-from version1.models import Transaction
-from version1.models import Cash_Withdrawl
-from version1.models import Cash_Transfer
 from version1.models import *
 from decimal import *
 from django.template import RequestContext, loader
@@ -16,49 +10,48 @@ from django.views.decorators.csrf import csrf_protect
 
 @csrf_protect
 def index(request):
+	'''It displays the main page which includes the form which validates the cardnumber'''
 	if 'cardnumber' in request.session:
-		return redirect('/user/validatepin/')
+		return redirect('/user/validatepin/')  
 		
 	if request.method == 'POST':
 		cardnum = request.POST['cardnumber']
 		card = ATM_Card.objects.filter(atmcard_num=cardnum)
 		if not card:
-			# There is no ATM card with that card number
-			return HttpResponse("Invalid Card")
+			cmessage=1
 		elif not card[0].card_status:
-			return HttpResponse("Blocked")
+			cmessage=2
 		else:
 			date = datetime.datetime.now()
 			if(card[0].expiry_date < date):
-				return HttpResponse("Expired")
+				cmessage=3
 			else:
-				request.session['cardnumber'] = cardnum
-				return redirect('/user/validatepin/')
-	return render_to_response('finale/index.html')
+				request.session['cardnumber'] = cardnum  
+				return redirect('/user/validatepin/')   
+	return render_to_response('finale/index.html',locals())   
 
 @csrf_protect
 def validatepin(request):
-	if 'cardnumber' not in request.session:
+	'''It displays the page which includes the form which validates the user based on pincode if card is already verified'''
+	if 'cardnumber' not in request.session:  
 		return redirect('/user/')
-	if 'pinverified' in request.session:
+	if 'pinverified' in request.session:       
 		return redirect('/user/options/')
 	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
 	username = atmcard.name
-	request.session['username'] = username
+	request.session['username'] = username        
 	
-	if request.method == 'POST':
-		cardpin = request.POST['pincode']
-		if int(atmcard.pin) == int(cardpin):
-			request.session['pinverified'] = True
+	if request.method == 'POST':                 
+		cardpin = request.POST['pincode']         
+		if int(atmcard.pin) == int(cardpin):         
+			request.session['pinverified'] = True       
 			return redirect('/user/options')
-		# Update the number of attempts accordingly
 		if 'pinattempt' not in request.session:
 			request.session['pinattempt'] = 1
 		else:
 			request.session['pinattempt'] = request.session['pinattempt'] + 1
 		
 		if request.session['pinattempt'] == 1:
-		# Message to be displayed
 				pinmessage = 1
 		elif request.session['pinattempt'] == 2:
 				pinmessage = 2
@@ -71,6 +64,7 @@ def validatepin(request):
 
 @csrf_protect
 def options(request):
+	'''displays the options available if user has been verified'''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -80,6 +74,7 @@ def options(request):
 
 @csrf_protect
 def balanceenquiry(request):
+	'''it displays the balance of card holder if he is already been verified'''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -94,6 +89,7 @@ def balanceenquiry(request):
 
 @csrf_protect	
 def cashwithdrawal(request):
+	'''It displays the page in which user can enter the amount and if user has entered the amount then transaction is saved in database based on status(COMPLETED OR NOT) '''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -117,6 +113,7 @@ def cashwithdrawal(request):
 
 @csrf_protect	
 def cashtransfer(request):
+	'''It displays the page in which user can enter the amount,account,name and if user has entered the cash transfer details then transaction is saved in database based on status(COMPLETED OR NOT) '''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -152,6 +149,8 @@ def cashtransfer(request):
 
 @csrf_protect
 def pinchange(request):
+	'''It displays the page in which user has the privelege to change his/her pincode'''
+	
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -186,6 +185,7 @@ def pinchange(request):
 
 @csrf_protect	
 def phonechange(request):
+	'''It displays the page in which user has the privelege to change his/her phoneno'''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -214,6 +214,7 @@ def phonechange(request):
 
 @csrf_protect	
 def fastcash(request):
+	'''It displays the page in which user can choose the amount listed in four options and the transaction is saved in database based on status(COMPLETED OR NOT) '''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
@@ -237,6 +238,7 @@ def fastcash(request):
 	
 @csrf_protect
 def exit(request):
+	'''To delete the session and take out the card'''
 	if 'cardnumber' not in request.session:
 		return redirect('/user/')
 	if 'pinverified' not in request.session:

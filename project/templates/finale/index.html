@@ -72,7 +72,8 @@
       }
       
     </style>
-    
+    <script type="text/javascript" src="/static/js/jquery.min.js">
+    </script>
   </head>
   
   <body>
@@ -86,8 +87,33 @@
               <h3>Hello user !</h3>
               <p> Please enter your 12 digit card ATM Card Number and press 'NEXT'</p>
               <div class="well">
+              {% if cmessage == 1 %}
+                <div class="alert-message error"><p><strong>Invalid card number!!</strong></strong></p></div>
+              <script type="text/javascript">
+                $(document).ready(function() {
+                $('#cardform').hide();
+                window.setTimeout("location.href='/user/'", 2000);
+                });
+              </script>
+              {% else %} {% if cmessage == 2 %}
+              <div class="alert-message error"><p><strong> Your ATM card has been blocked for further transactions. Please contact the XYZ BANK regarding the issue</strong></p></div>
+              <script type="text/javascript">
+                $(document).ready(function() {
+                $('#cardform').hide();
+                window.setTimeout("location.href='/user/'", 2000);
+                });
+              </script>
+              {% else %} {% if cmessage == 3 %}
+              <div class="alert-message error"><p><strong> Your ATM card has been expired. Please contact the XYZ BANK regarding the issue</strong></p></div>
+              <script type="text/javascript">
+                $(document).ready(function() {
+                $('#cardform').hide();
+                window.setTimeout("location.href='/user/'", 2000);
+                });
+              </script>
+              {% endif %} {% endif %} {% endif %}
               
-              <form name="input" action="." method="post">{% csrf_token %}<label for="xlInput">Card Number &nbsp;</label>
+              <form name="input" id="cardform" action="." method="post">{% csrf_token %}<label for="xlInput">Card Number &nbsp;</label>
               <input type="text" class="span3" name="cardnumber" id="cardnumber"/>
               <div class="actionsNew">
                 <input type="submit" class="btn primary disabled" value="NEXT" />
