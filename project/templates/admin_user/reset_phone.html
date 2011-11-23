@@ -81,15 +81,16 @@
           <div class="page-header">
             <h1>XYZ Bank ATM<small>    Its Complicated</small></h1>
           </div>
+          <p align="RIGHT">  <a href = "/admin_user/logout/" > LOGOUT</a></p><br>
           <div class="row">
             <div class="span10">
               <h3>Hello Admin</h3>
               <p> Please enter the new Phone Number </p>
               <div class="well">
 					<form name="input" action="/admin_user/update_card_details/reset_phone_operation/" method="get">
-						<label for="xlInput">Enter New Phone no: &nbsp;</label>
+						<label for="xlInput">Enter New Phone no:&nbsp;</label>
 						 <input type="text" name="phone1" class="span3" id="phone1" /><br>
-						<label for="xlInput">Confirm New Phone no:  &nbsp;</label> 
+						<label for="xlInput">Confirm New Phone no:&nbsp;</label> 
 						<input type="text" name="phone2" class="span3" id="phone2" /><br>
 						<div class="actionsNew">
 						<input type="submit" class="btn primary disabled" value="Confirm" />
@@ -99,8 +100,11 @@
 							<div class="alert-message info"><strong> FIELD CAN NOT REMAIN EMPTY</strong></div>
 						{% endif %}
 					{% if match %}
-							<div class="alert-message info"><strong> PINCODE YOU ENTERED DOES NOT MATCH</strong></div>
+							<div class="alert-message info"><strong> PHONE NO YOU ENTERED DOES NOT MATCH</strong></div>
 						{% endif %}
+					{% if m %}
+							<div class="alert-message info"><strong> PHONE NO MUST BE OF 10 DIGIT INTEGER</strong></div>
+						{% endif %}		
     
     </div>
             </div>

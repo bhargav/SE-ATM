@@ -84,23 +84,42 @@
           <p align="RIGHT">  <a href = "/admin_user/logout/" > LOGOUT</a></p><br>
           <div class="row">
             <div class="span10">
-              <h3>Hello admin</h3>
-              <p> Please enter your 12 digit card ATM Card Number </p>
+              <h3>Hello Admin</h3>
+              <p> Please enter the details of the new ATM customer </p>
               <div class="well">
               
-						<form name="input" action="/admin_user/update_card_details/validate_card/"  method="post" >
-						<label for="xlInput">Card Number: &nbsp;</label> <input type="text" name="cardnumber" class="span3" id="cardnumber" />
+              
+					<form name="input" action="/admin_user/add_atm_operation/" method="get">
+						<label for="xlInput">Account no &nbsp;</label> 
+							<select name="acc" class="span3" >
+
+						{% for acc in acc_list.all %}
+							<option value="{{ acc.acc_num}}" selected="selected">{{ acc.acc_num}}</option>
+						{% endfor %}
+							</select>
+	
+						<br>
+						<label for="xlInput">Pin &nbsp;</label> 
+						<input type="text" name="pin" class="span3" id="pin" /><br>
+						<label for="xlInput">Name &nbsp;</label> 
+						<input type="text" name="name" class="span3" id="name" /><br>
+						<label for="xlInput">Address &nbsp;</label> 
+						<input type="text" name="address" class="span3" id="address" /><br>
+						<label for="xlInput">Phone no &nbsp;</label> 
+						<input type="text" name="phone" class="span3" id="phone" /><br>
+						<INPUT type="radio" name="two" value="True"> Enable<BR>
+						<INPUT type="radio" name="two" value="False"> Disable<BR>
+						
+						
 						<div class="actionsNew">
-							<input type="submit" class="btn primary disabled" value="Submit" />
+						<input type="submit" class="btn primary disabled" value="Confirm" />
 						</div>
-						</form>
-						{% if failed %}
-							<div class="alert-message info"><strong> WRONG CARD NUMBER</strong></div>
-						{% endif %}
 						{% if m %}
-							<div class="alert-message info"><strong> WRONG CARD NUMBER</strong></div>
-						{% endif %}
-				</div>
+							<div class="alert-message info"><strong> PIN MUST BE 4 DIGIT INTEGER AND PHONE NO MUST BE 10 DIGITS</strong></div>
+							{% endif %}	
+					</form>
+				
+    </div>
             </div>
             <div class="span4">
               <h3>Secondary content</h3>
@@ -116,4 +135,5 @@
 
   </body>
 </html>
+
 

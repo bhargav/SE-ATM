@@ -7,6 +7,9 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect
 import datetime
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
+from django.db.models import Avg, Max, Min, Count
+import random
+from dateutil.relativedelta import relativedelta
 
 @csrf_protect
 def index(request):
@@ -257,14 +260,15 @@ def admin_index(request):
 # this function starts the session for the Administrator if username and password are entered correctly      
 @csrf_protect
 def admin_verify_user(request):
-	admin=Admin.objects.filter(Admin_id=request.GET['username'],Password=request.GET['password'])
-	if not admin:
-		failed=True
-		return render_to_response('admin_user/index.html', {"failed":failed})#locals())
-	else:	 	
-		request.session['login'] = True
-		return render_to_response('admin_user/main_page.html',locals())
-		
+	if request.method == 'POST':
+		admin=Admin.objects.filter(Admin_id=request.POST['username'],Password=request.POST['password'])
+		if not admin:
+			failed=True
+			return render_to_response('admin_user/index.html', {"failed":failed})#locals())
+		else:	 	
+			request.session['login'] = True
+			return render_to_response('admin_user/main_page.html',locals())
+			
 		
 # admin_main_page() displays all the option for the administrator  		
 def admin_main_page(request):
@@ -280,7 +284,33 @@ def admin_add_card(request):
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
-		return render_to_response('admin_user/main_page.html', {"login":login})#locals())
+		acc_list = Account_Ext.objects.all()	
+		return render_to_response('admin_user/add_atm.html',{"acc_list":acc_list})
+		
+def admin_add_card_operation(request):
+	if 'login' not in request.session:
+		return render_to_response('admin_user/index.html', locals())
+	else:
+		try:
+			if ((request.GET['phone']=="") or (request.GET['address']=="")or (request.GET['pin']=="") or (request.GET['name']=="")):
+				empty=True 
+				return render_to_response('admin_user/view_atm_status.html', {"Machine_list":Machine_list}, {"empty":empty})
+			else:
+				if (request.GET['two']=='False'):
+					t=False
+				else: 
+					t=True
+				p=datetime.datetime.now()
+				q =p + relativedelta(years=+4)
+				e = ATM_Card(atmcard_num=(1111+random.randint(1000,8888)),account_num_id=request.GET['acc'],name=request.GET['name'],pin=request.GET['pin'],date_of_issue=p,expiry_date=q,address=request.GET['address'],two_factor=t,phone_num=request.GET['phone'],card_status=True)
+				e.save()
+				return render_to_response('admin_user/main_page.html',locals())
+		except Exception as e:
+				acc_list = Account_Ext.objects.all()	
+				m=True
+				#return render_to_response('admin_user/index.html', locals())
+				return render_to_response('admin_user/add_atm.html',locals())
+				 
 ##################################### admin : atm status ##########################################
 # admin_atm_status() will show the details of all the ATM-machines 
 def admin_atm_status(request):
@@ -314,17 +344,21 @@ def admin_card_validation(request):
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
-		cardcheck =ATM_Card.objects.filter(atmcard_num=request.GET['cardnumber'])
-		if not cardcheck:
-			failed=True
-			return render_to_response('admin_user/enter_card_no.html', {"failed":failed})	
-		else:			 	
-			card=cardcheck
-			request.session['admin_session_card'] = request.GET['cardnumber']
-			request.session['admin_session']=1
-			return render_to_response('admin_user/update_card_details.html', locals())
-			
-		
+		try:
+			if request.method == 'POST':
+				[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.POST['cardnumber'])
+				if not cardcheck:
+					failed=True
+					return render_to_response('admin_user/enter_card_no.html', {"failed":failed})	
+				else:			 	
+					#card=cardcheck
+					request.session['admin_session_card'] = request.POST['cardnumber']
+					request.session['admin_session']=1
+					return render_to_response('admin_user/update_card_details.html', locals())
+		except Exception as e:
+				m=True 
+				return render_to_response('admin_user/enter_card_no.html', {"m":m})
+
 # admin_update_card_main_page() displays all the options on the screen for the administrator too update the card details		
 def	admin_update_card_main_page(request):
 	if 'login' not in request.session:
@@ -399,19 +433,23 @@ def admin_reset_pincode_operation(request):
 		if 'admin_session' not in request.session:
 			return render_to_response('admin_user/enter_card_no.html', locals())
 		else:
-			if ((request.GET['password1']=="") or (request.GET['password2']=="")):
-				empty=True 
-				return render_to_response('admin_user/reset_pin.html', {"empty":empty})		
-			else:
-				if (request.GET['password1']==request.GET['password2']):			
-					[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.session['admin_session_card'])
-					cardcheck.pin=request.GET['password1']
-					cardcheck.save()
-					return render_to_response('admin_user/update_card_details.html', locals())	
+			try:
+				if ((request.GET['password1']=="") or (request.GET['password2']=="")):
+					empty=True 
+					return render_to_response('admin_user/reset_pin.html', {"empty":empty})		
 				else:
-					match=True 
-					return render_to_response('admin_user/reset_pin.html', {"match":match})
-
+					if (request.GET['password1']==request.GET['password2']):			
+						[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.session['admin_session_card'])
+						cardcheck.pin=request.GET['password1']
+						cardcheck.save()
+						return render_to_response('admin_user/update_card_details.html', locals())	
+					else:
+						match=True 
+						return render_to_response('admin_user/reset_pin.html', {"match":match})
+			except Exception as e:
+				m=True 
+				return render_to_response('admin_user/reset_pin.html', {"m":m})
+	
 # admin_reset_phone()	aks the administrator to enter the new phone			
 def admin_reset_phone(request):
 	if 'login' not in request.session:
@@ -430,19 +468,22 @@ def admin_reset_phone_operation(request):
 		if 'admin_session' not in request.session:
 			return render_to_response('admin_user/enter_card_no.html', locals())
 		else:
-			if ((request.GET['phone1']=="") or (request.GET['phone2']=="")):
-				empty=True 
-				return render_to_response('admin_user/reset_phone.html', {"empty":empty})		
-			else:
-				if (request.GET['phone1']==request.GET['phone2']):			
-					[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.session['admin_session_card'])
-					cardcheck.phone_num=request.GET['phone1']
-					cardcheck.save()
-					return render_to_response('admin_user/update_card_details.html', locals())	
+			try:
+				if ((request.GET['phone1']=="") or (request.GET['phone2']=="")):
+					empty=True 
+					return render_to_response('admin_user/reset_phone.html', {"empty":empty})		
 				else:
-					match=True 
-					return render_to_response('admin_user/reset_phone.html', {"match":match})	
-				 
+					if (request.GET['phone1']==request.GET['phone2']):			
+						[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.session['admin_session_card'])
+						cardcheck.phone_num=request.GET['phone1']
+						cardcheck.save()
+						return render_to_response('admin_user/update_card_details.html', locals())	
+					else:
+						match=True 
+						return render_to_response('admin_user/reset_phone.html', {"match":match})	
+			except Exception as e:
+				m=True 
+				return render_to_response('admin_user/reset_phone.html', {"m":m})			 
 				
 # admin_view_history() shows the previous history of the ATM card 					
 def admin_view_history(request):
@@ -473,6 +514,13 @@ def admin_update_date_operation(request):
 			return render_to_response('admin_user/enter_card_no.html', locals())
 		else:							
 			[cardcheck] =ATM_Card.objects.filter(atmcard_num=request.session['admin_session_card'])
-			#cardcheck.phone_num=request.GET['date']
-			#cardcheck.save()
+			t=cardcheck.expiry_date
+			t += relativedelta(years=+4)
+			cardcheck.expiry_date=t
+			cardcheck.save()
 			return render_to_response('admin_user/update_card_details.html', locals())	
+
+def admin_logout(request):
+	for sesskey in request.session.keys():
+		del request.session[sesskey]
+	return render_to_response('admin_user/index.html', locals())
