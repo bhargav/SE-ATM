@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 150px;
+        padding-left : 220px;
         padding-bottom: 0px;
       }
       
@@ -72,8 +72,7 @@
       }
       
     </style>
-   <script type="text/javascript" src="/static/js/jquery.min.js">
-			</script>
+    
   </head>
   
   <body>
@@ -84,34 +83,24 @@
           </div>
           <div class="row">
             <div class="span10">
-              {% if username %}
-              <h3>Hello {{ username }} !</h3>
-            {% else %}
-              <h3>Hello user !</h3>
-            {% endif %}  
-              <p> Please enter the withdrawal amount press 'NEXT'</p>
+              <h3>Hello user!</h3>
+              <p> Please select the ATM  and press 'NEXT'</p>
               <div class="well">
-              {% if wdmessage == 1 %}
-              <div class="alert-message success"><p><strong>Your Transaction is SUCCESSFULL!</strong></p></div>
-              <script type="text/javascript">
-              $(document).ready(function() {
-                $('#amount').hide();
-                window.setTimeout("location.href='/user/options/'", 2000);
-                });
-               </script> 
-              {% else %} {% if wdmessage == 2 %}
-              <div class="alert-message error"><p><strong>UNSUCCESFULL!! </strong>You donot have sufficient money</p></div>
-              {% else %} {% if wdmessage == 3 %}
-              <div class="alert-message error"><p><strong>UNSUCCESFULL!! </strong>INVALID DATA</p></div>
-              {% endif %} {% endif %}{% endif %}
-              <form name="input" id="amount" action="." method="post">{% csrf_token %}<label for="xlInput">Amount &nbsp;</label>
-              <input type="text" class="span3" name="amount" id="amount"/>
-              <div class="actionsNew">
-				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>	  
-				<input type="submit" class="btn primary disabled" value="NEXT" />
-              </div>
-              </form>
-              </div>
+					<form name="input" action="." method="post">{% csrf_token %}
+						<label for="xlInput">MACHINE &nbsp;</label> 
+							<select name="m" class="span3" id="m" >
+						{% for m in machinelist %}
+							<option value="{{m.machine_id}}" selected="selected">{{ m.location}}</option>
+						{% endfor %}
+							</select>
+	
+						<br>
+						<div class="actionsNew">
+						<input type="submit" class="btn primary disabled" value="NEXT"/>
+						</div>	
+					</form>
+				
+    </div>
             </div>
             <div class="span4">
               <h3>Secondary content</h3>
@@ -127,4 +116,5 @@
 
   </body>
 </html>
+
 
