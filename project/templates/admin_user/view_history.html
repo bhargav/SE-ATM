@@ -85,8 +85,20 @@
           <div class="row">
             <div class="span10">
               <h3>Hello Admin</h3>
-              <p> History is not implemented</p>
-              
+              <p> YOUR HISTORY IS </p> 
+              <table class="zebra-striped">
+			  {%if list_transaction%}
+			  <tr><td><h4>DATE</h4></td><td><h4>TRANSACTION TYPE</h4></td><td><h4>AMOUNT</h4></td><td><h4>STATUS</h4></td></tr>
+              {%for t in list_transaction%}
+              <tr><td>{{t.date}}</td><td>{{t.tt}}</td><td>{{t.amount}}</td><td>{{t.status}}</td></tr>
+              {%endfor%}
+              {%else%}
+              <div class="alert-message error"><p><strong>THERE ARE NO TRANSACTIONS</strong></p></div>
+              {%endif%}
+              </table>
+              <div class="actionsNew">
+			  <button type="button" id="back" value="back" class="btn primary disabled" onclick="location.href='/admin_user/update_card_details/'"> Back </button>
+              </div> 
             </div>
             <div class="span4">
               <h3>Secondary content</h3>

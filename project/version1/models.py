@@ -1,24 +1,24 @@
 from django.db import models
 from decimal import *
 
-# Admin model stores the information of adiministrator. 
-# It has 2 fields
-# Admin_id -->char(100)
-# password -->char(100)
 class Admin(models.Model):
+	## Admin model stores the information of adiministrator. 
+	## It has 2 fields
+	## Admin_id -->char(100)
+	## password -->char(100)
 	Admin_id = models.CharField("ADMIN ID",max_length=100,primary_key=True)
 	Password = models.CharField("PASSWORD",max_length=100)
 	def __unicode__(self):
 		return str(self.Admin_id)
 
-# Machine model stores the information of ATM_Machine 
-# It has 6 fields
-# location ---> Char(200)
-# minimum_atm_balance ---> Decimal
-# current_balance ----> Decimal
-# last_refill_date ----> DateTimeField
-# next_maintainence_date ----> DateTimeField
 class Machine(models.Model):
+	## Machine model stores the information of ATM_Machine 
+	## It has 6 fields
+	## location ---> Char(200)
+	## minimum_atm_balance ---> Decimal
+	## current_balance ----> Decimal
+	## last_refill_date ----> DateTimeField
+	## next_maintainence_date ----> DateTimeField
 	machine_id = models.IntegerField("MACHINE ID",primary_key=True)
 	location = models.CharField("LOCATION",max_length=200)
 	minimum_atm_balance = models.DecimalField("MINIMUM ATM BALANCE",decimal_places=2,max_digits=10)
@@ -40,14 +40,14 @@ class Machine(models.Model):
 				else:			
 					super(Machine, self).save()
 
-# MachineRefill model stores the information of refill for ATM machine. 
-# It has 5 fields
-# refill_id -->Integer
-# machine_id ---> ForeignKey of Machine
-# refill_date ---> DateTimeField
-# previous_balance ---> DecimalField
-# amount_refilled ----> Decimal
 class MachineRefill(models.Model):
+	## MachineRefill model stores the information of refill for ATM machine. 
+	## It has 5 fields
+	## refill_id -->Integer
+	## machine_id ---> ForeignKey of Machine
+	## refill_date ---> DateTimeField
+	## previous_balance ---> DecimalField
+	## amount_refilled ----> Decimal
 	refill_id = models.IntegerField("REFILL ID",primary_key=True)
 	machine_id = models.ForeignKey(Machine)
 	refill_date = models.DateTimeField('REFILL DATE')
@@ -67,14 +67,14 @@ class MachineRefill(models.Model):
 				else:			
 					super(MachineRefill, self).save()	
 	
-# Account_Ext model stores the information of account with atm card information. 
-# It has 5 fields
-# acc_num = BigInteger
-# atmcard_num ---> BigInteger
-# name --> Char
-# phone_num --> BigInteger
-# balance --> Decimal
 class Account_Ext(models.Model):
+	## Account_Ext model stores the information of account. 
+	## It has 5 fields
+	## acc_num = BigInteger
+	## atmcard_num ---> BigInteger
+	## name --> Char
+	## phone_num --> BigInteger
+	## balance --> Decimal
 	acc_num = models.BigIntegerField("Account Number",primary_key=True)
 	name = models.CharField("NAME",max_length=100)
 	phone_num = models.BigIntegerField("Phone NUMBER")
@@ -99,18 +99,18 @@ class Account_Ext(models.Model):
 		else:
 			raise Exception, "ACCOUNT NUMBER SHOULD BE NON ZERO POSITIVE"
 	
-# ATM_Card model stores the information of ATM cars 
-# It has 9 fields
-# atmcard_num ---> ForeignKey of Account_Ext
-# name ---> Char(100)
-# pin ---> Integer
-# date_of_issue ---> DateTimeField
-# expiry_date ---> DateTimeField
-# address --> Char(300)
-# two_factor ---> Boolean
-# phone_num ---> BigInteger
-# card_status ---> Boolean
 class ATM_Card(models.Model):
+	## ATM_Card model stores the information of ATM cards 
+	## It has 9 fields
+	## atmcard_num ---> ForeignKey of Account_Ext
+	## name ---> Char(100)
+	## pin ---> Integer
+	## date_of_issue ---> DateTimeField
+	## expiry_date ---> DateTimeField
+	## address --> Char(300)
+	## two_factor ---> Boolean
+	## phone_num ---> BigInteger
+	## card_status ---> Boolean
 	atmcard_num = models.BigIntegerField("ATM Card Number", primary_key=True)
 	account_num = models.ForeignKey(Account_Ext)
 	name = models.CharField("NAME ON CARD",max_length=100)
@@ -150,17 +150,16 @@ class ATM_Card(models.Model):
 		else:
 			raise Exception, "ATM CARD NO. SHOULD BE NON ZERO POSITIVE"	
 	
-
-# Transaction() is the abstract class which has sub-classes  
-# It has 7 fields
-# atmcard_num ---> ForeignKey of Account_Ext
-# machine_id ---> ForeignKey of Machine
-# tid ---> Integer
-# date_time ---> DateTimeField
-# status ---> Char(100)
-# rescode ---> Integer
-# type_trans ---> Char(100)
 class Transaction(models.Model):
+	## Transaction is the abstract class which has sub-classes  
+	## It has 7 fields
+	## atmcard_num ---> ForeignKey of Account_Ext
+	## machine_id ---> ForeignKey of Machine
+	## tid ---> Integer
+	## date_time ---> DateTimeField
+	## status ---> Char(100)
+	## rescode ---> Integer
+	## type_trans ---> Char(100)
 	atmcard_num = models.ForeignKey(ATM_Card)
 	machine_id = models.ForeignKey(Machine)
 	tid = models.IntegerField("TRANSACTION ID",primary_key=True)
@@ -171,10 +170,10 @@ class Transaction(models.Model):
 	class Meta:
 		abstract = True			
 
-# Balance_Enquiry() is the inherited class of trasaction class
-# It has 1 fields
-# bal_amount ----> Decimal
 class Balance_Enquiry(Transaction):
+	## Balance_Enquiry() is the inherited class of trasaction class
+	## It has 1 fields
+	## bal_amount ----> Decimal
 	bal_amount = models.DecimalField("BALANCE AMOUNT",decimal_places=2,max_digits=10)
 	def __unicode__(self):
 		return str(self.tid)
@@ -203,6 +202,10 @@ class Balance_Enquiry(Transaction):
 					super(Balance_Enquiry, self).save()
 		
 class Phone_change(Transaction):
+	## phone_change() is the inherited class of trasaction class
+	## It has 2 fields
+	## prev_phone ---> BigInteger
+	## new_phone ---> BigInteger
 	prev_phone = models.BigIntegerField("PREVIOUS PHONE NO")
 	new_phone = models.BigIntegerField("NEW PHONE NO")
 	def __unicode__(self):
@@ -239,12 +242,12 @@ class Phone_change(Transaction):
 									count=count+1	
 								self.tid = count+1			
 								super(Phone_change, self).save()		
-
-# pin_change() is the inherited class of trasaction class
-# It has 2 fields
-# prev_pin ---> Integer
-# new_pin ---> Integer	
+	
 class Pin_change(Transaction):
+	## pin_change() is the inherited class of trasaction class
+	## It has 2 fields
+	## prev_pin ---> Integer
+	## new_pin ---> Integer
 	prev_pin = models.IntegerField("PREVIOUS PIN")
 	new_pin = models.IntegerField("NEW PIN")
 	def __unicode__(self):
@@ -282,12 +285,12 @@ class Pin_change(Transaction):
 								self.tid = count+1			
 								super(Pin_change, self).save()					
 	
-# Cash_Transfer() is the inherited class of trasaction class
-# It has 3 fields
-# ben_acc_num ---> BigInteger
-# ben_name ---> Char(100)
-# amt_trans ----> Decimal
 class Cash_Transfer(Transaction):
+	## Cash_Transfer() is the inherited class of trasaction class
+	## It has 3 fields
+	## ben_acc_num ---> BigInteger
+	## ben_name ---> Char(100)
+	## amt_trans ----> Decimal
 	ben_acc_num = models.BigIntegerField("BENEFICIARY ACCOUNT NUMBER")
 	ben_name = models.CharField("BENEFICIARY NAME",max_length = 100)
 	amt_trans = models.DecimalField("AMOUNT",decimal_places=2,max_digits=10)
@@ -323,14 +326,13 @@ class Cash_Transfer(Transaction):
 							self.tid = count+1	
 							super(Cash_Transfer, self).save()			
 	
-# Cash_Withdrawl() is the inherited class of trasaction class
-# It has 2 fields
-# amt_with ---> Decimal
-# cur_bal ---> Decimal
 class Cash_Withdrawl(Transaction):
+	## Cash_Withdrawl() is the inherited class of trasaction class
+	## It has 2 fields
+	## amt_with ---> Decimal
+	## cur_bal ---> Decimal
 	amt_with = models.DecimalField("AMOUNT WITHDRAWN",decimal_places=2,max_digits=10)
 	cur_bal = models.DecimalField("CURRENT BALANCE",decimal_places=2,max_digits=10)
-	#denomination 
 	def __unicode__(self):
 		return str(self.tid)
 	def save(self, *args, **kwargs):
@@ -361,6 +363,10 @@ class Cash_Withdrawl(Transaction):
 						super(Cash_Withdrawl, self).save()		
 
 class Services(Transaction):
+	## Services() is the inherited class of trasaction class
+	## It has 2 fields
+	## amount ---> Decimal
+	## service---> Char
 	amount = models.DecimalField("AMOUNT PAID", decimal_places=2, max_digits=10)
 	service = models.CharField("SERVICE DETAILS", max_length = 100)
 	def __unicode__(self):

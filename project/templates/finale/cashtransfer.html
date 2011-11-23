@@ -99,7 +99,7 @@
               <script type="text/javascript">
                 $(document).ready(function() {
                 $('#cashform').hide();
-                window.setTimeout('location.reload()', 5000);
+                window.setTimeout("location.href='/user/options/'", 5000);
                 });
               </script>
               {% else %} {% if ctmessage == 2 %}
@@ -107,7 +107,7 @@
               <script type="text/javascript">
                 $(document).ready(function() {
                 $('#cashform').hide();
-                window.setTimeout('location.reload()', 5000);
+                window.setTimeout("location.href='/user/options/'", 2000);
                 });
               </script>
               {% else %} {% if ctmessage == 3 %}
@@ -115,7 +115,7 @@
               <script type="text/javascript">
                 $(document).ready(function() {
                 $('#cashform').hide();
-                window.setTimeout('location.reload()', 5000);
+                window.setTimeout("location.href='/user/options/'", 2000);
                 });
               </script>
               {% endif %} {% endif %} {% endif %} {% endif %}
