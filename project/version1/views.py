@@ -11,6 +11,7 @@ import sys
 import random
 from django.db.models import Avg, Max, Min, Count
 from dateutil.relativedelta import relativedelta
+import sms
 
 @csrf_protect
 def index(request):
@@ -59,6 +60,7 @@ def validatepin(request):
 				if atmcard.two_factor:
 					request.session['passcode']=random.randint(1000,9999)
 					print request.session['passcode']
+					sms.sendSMS(atmcard.phone_num, 'PASSCODE:%d' % request.session['passcode'])
 					return redirect('/user/validatepasscode')       
 				return redirect('/user/options')
 			if 'pinattempt' not in request.session:
