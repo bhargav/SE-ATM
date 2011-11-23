@@ -15,7 +15,9 @@ import sms
 
 @csrf_protect
 def main(request):
-	'''It displays the main page which includes the form which validates the cardnumber'''
+	##To select the machine
+	##@param machineid
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/options/'.
 	if 'cardnumber' in request.session:
 		return redirect('/user/validatepin/')  
 	if 'pinverified' in request.session:
@@ -30,7 +32,9 @@ def main(request):
 
 @csrf_protect
 def index(request):
-	'''It displays the main page which includes the form which validates the cardnumber'''
+	##for card validation.
+	##@param card number
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')  
 	if 'cardnumber' in request.session:
@@ -58,7 +62,9 @@ def index(request):
 
 @csrf_protect
 def validatepin(request):
-	'''It displays the page which includes the form which validates the user based on pincode if card is already verified'''
+	##for pin validation and messaging two factor verification code to registered phone no. of card holder(if two facto enabled).
+	##@param pincode and phoneno(if needed)
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:  
@@ -115,7 +121,9 @@ def validatepin(request):
 
 @csrf_protect
 def validatepasscode(request):
-	'''It displays the page which includes the form which validates the user based on pincode if card is already verified'''
+	##for passcode validation(if enabled).
+	##@param two factor verification code
+	##@return is used to redirect to various pages like '/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:  
@@ -161,10 +169,11 @@ def validatepasscode(request):
 					request.session.flush()	  			
 	return render_to_response('finale/passcode.html', locals())
 
-
 @csrf_protect
 def options(request):
-	'''displays the options available if user has been verified'''
+	##it shows the various options available to user
+	##@param 'request' stores which form method we are using i.e(GET/POST) and session variable
+	##@return is used to redirect to various pages like '/user/pinvalidation/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -177,7 +186,9 @@ def options(request):
 
 @csrf_protect
 def balanceenquiry(request):
-	'''it displays the balance of card holder if he is already been verified'''
+	##To show the balance to cardholder and saves the transaction in database.
+	##@param 'request' stores which form method we are using i.e(GET/POST) and session variable
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -194,7 +205,9 @@ def balanceenquiry(request):
 
 @csrf_protect	
 def cashwithdrawal(request):
-	'''It displays the page in which user can enter the amount and if user has entered the amount then transaction is saved in database based on status(COMPLETED OR NOT) '''
+	##To withdraw the money from machine and saves the transaction in database.
+	##@param withdrawal amount
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -223,7 +236,9 @@ def cashwithdrawal(request):
 
 @csrf_protect	
 def cashtransfer(request):
-	'''It displays the page in which user can enter the amount,account,name and if user has entered the cash transfer details then transaction is saved in database based on status(COMPLETED OR NOT) '''
+	##To transfer the cash from cardholder's account to another specified account and saves the transaction in database.
+	##@param name and account no. in which we want to transfer the money and amount to transfer.
+	##@return is used to redirect to various pages like '/user/pinvalidation/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -260,7 +275,9 @@ def cashtransfer(request):
 
 @csrf_protect
 def pinchange(request):
-	'''It displays the page in which user has the privelege to change his/her pincode'''
+	##To change the pin and saves the transaction in database.
+	##@param previous pincode,new pincode,confirm pincode
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -301,7 +318,9 @@ def pinchange(request):
 
 @csrf_protect	
 def phonechange(request):
-	'''It displays the page in which user has the privelege to change his/her phoneno'''
+	##To change the phoneno. and saves the transaction in database.
+	##@param new phoneno and confirm phoneno
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -337,7 +356,9 @@ def phonechange(request):
 
 @csrf_protect	
 def fastcash(request):
-	'''It displays the page in which user can choose the amount listed in four options and the transaction is saved in database based on status(COMPLETED OR NOT) '''
+	##To withdraw the money by just selecting one of the option available to cardholder and saves the transaction in database.
+	##@param selected amount
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -367,7 +388,9 @@ def fastcash(request):
 
 @csrf_protect
 def history(request):
-	'''displays the history of successfull transactions made by user'''
+	##To show the history of successfull transactions(only involving money) made by cardholder and saves the transaction in database.
+	##@param 'request' stores which form method we are using i.e(GET/POST) and session variable
+	##@return is used to redirect to various pages like '/user/validatepin/','/user/card/','/user/'  and '/user/options/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -396,7 +419,9 @@ def history(request):
 	
 @csrf_protect
 def exit(request):
-	'''To delete the session and take out the card'''
+	##To delete the session.
+	##@param 'request' stores which form method we are using i.e(GET/POST) and session variable
+	##@return is used to redirect to various pages like '/user/pinvalidation/','/user/card/' and '/user/'.
 	if 'machine' not in request.session:
 		return redirect('/user/')
 	if 'cardnumber' not in request.session:
@@ -406,17 +431,18 @@ def exit(request):
 	request.session.flush()
 	return redirect('/user/')
 
-# admin_index() is the index page of the administrator where he will be asked to fill the 
-# user name and password 
 @csrf_protect
-def admin_index(request):    
-    return render_to_response('admin_user/index.html', locals())
+def admin_index(request): 
+	## admin_index() displays the index page of the administrator where he will be asked to fill the user name and password 
+	return render_to_response('admin_user/index.html', locals())
     
     
-# admin_verify_user() user will verify the administrator and password entered by him
-# this function starts the session for the Administrator if username and password are entered correctly      
+   
 @csrf_protect
 def admin_verify_user(request):
+	## admin_verify_user() user will verify the administrator and password entered by him
+	## this function also starts the session for the Administrator if username and password are entered correctly   
+	##@ param username and password of admin
 	if request.method == 'POST':
 		admin=Admin.objects.filter(Admin_id=request.POST['username'],Password=request.POST['password'])
 		if not admin:
@@ -428,17 +454,18 @@ def admin_verify_user(request):
 	else:
 		return redirect('/admin_user/')	
 		
-# admin_main_page() displays all the option for the administrator  		
+ 		
 def admin_main_page(request):
+	## admin_main_page() displays all the option for the administrator 
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
 		return render_to_response('admin_user/main_page.html', locals())
 		
 		
-##################################### admin : add new card ######################################
-# admin_add_card() adds a new ATM card for the customer
+
 def admin_add_card(request):
+	## admin_add_card() displays the page which asks for card details
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -446,6 +473,8 @@ def admin_add_card(request):
 		return render_to_response('admin_user/add_atm.html',{"acc_list":acc_list})
 		
 def admin_add_card_operation(request):
+	## admin_add_card_operation() creates new ATM card
+	##@param account no.,phoneno.,name,address,twofactorverification
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -489,16 +518,17 @@ def admin_update_refill(request):
 		machine.save()
 		Machine_list = Machine.objects.all()
 		return render_to_response('admin_user/view_atm_status.html', {"Machine_list":Machine_list})
-#################################### admin : update card details #####################################
-# admin_update_card_details will ask the administrator to enter the atm card number which he want to update
+
 def admin_update_card_details(request):
+	## admin_update_card_details will ask the administrator to enter the atm card number which he want to update
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
 		return render_to_response('admin_user/enter_card_no.html', locals())	
-# admin_card_validation() will validate the atm card no and it is correct then it will take the administrator to options
-# else it will dispay that card is not valid
+
 def admin_card_validation(request):
+	## admin_card_validation() will validate the atm card no and it is correct then it will take the administrator to options else it will dispay that card is not valid
+	##@param cardnumber
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -517,8 +547,9 @@ def admin_card_validation(request):
 				m=True 
 				return render_to_response('admin_user/enter_card_no.html', {"m":m})
 
-# admin_update_card_main_page() displays all the options on the screen for the administrator too update the card details		
+		
 def	admin_update_card_main_page(request):
+	## admin_update_card_main_page() displays all the options on the screen for the administrator too update the card details
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -527,8 +558,9 @@ def	admin_update_card_main_page(request):
 		else:			
 			return render_to_response('admin_user/update_card_details.html', locals())
 			
-# admin_block_card() asks of the confirmation from the administrator to block the ATM card 		
+		
 def admin_block_card(request):
+	## admin_block_card() displays the page on which we can block the card
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -536,9 +568,9 @@ def admin_block_card(request):
 			return render_to_response('admin_user/enter_card_no.html', locals())
 		else:			
 			return render_to_response('admin_user/block_card.html', locals())
-
-# admin_block_card() block the ATM card		
+	
 def admin_block_card_operation(request):
+	## admin_block_card() blocks the ATM card and saves in the database.	
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -550,8 +582,9 @@ def admin_block_card_operation(request):
 			cardcheck.save()
 			return render_to_response('admin_user/update_card_details.html', locals())	
 			
-# admin_activate_card() asks of the confirmation from the administrator to activate the ATM card	
+	
 def admin_activate_card(request):
+	## admin_activate_card() displays the page which asks for confirmation of the administrator to activate the ATM card
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -560,8 +593,9 @@ def admin_activate_card(request):
 		else:			
 			return render_to_response('admin_user/activate_card.html', locals())	
 		
-# admin_activates_card() activates the ATM card		
+		
 def admin_activate_card_operation(request):
+	## admin_activates_card() activates the ATM card by changing status to true in database
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -573,8 +607,9 @@ def admin_activate_card_operation(request):
 			cardcheck.save()
 			return render_to_response('admin_user/update_card_details.html', locals())	
 			
-# admin_reset_pincode()	aks the administrator to enter the new pin		
+		
 def admin_reset_pincode(request):
+	## admin_reset_pincode() displays the page which aks the administrator to enter the new pin
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -583,8 +618,10 @@ def admin_reset_pincode(request):
 		else:			
 			return render_to_response('admin_user/reset_pin.html', locals())	
 			
-# admin_reset_pincode_operation() reset the pin to new pin enetered by the administrator			
+			
 def admin_reset_pincode_operation(request):
+	## admin_reset_phone() displays the page from which adminstrator can change the pincode of cardholder	
+	##@param new pincode and confirm pincode
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -608,8 +645,8 @@ def admin_reset_pincode_operation(request):
 				m=True 
 				return render_to_response('admin_user/reset_pin.html', {"m":m})
 	
-# admin_reset_phone()	aks the administrator to enter the new phone			
 def admin_reset_phone(request):
+	## admin_reset_phone() displays the page from which adminstrator can change the phone			
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -618,8 +655,10 @@ def admin_reset_phone(request):
 		else:			
 			return render_to_response('admin_user/reset_phone.html', locals())	
 
-# admin_reset_phone_operation() reset the phone to new phone enetered by the administrator			
+			
 def admin_reset_phone_operation(request):
+	## admin_reset_phone_operation() reset the phone to new phone enetered by the administrator
+	##@param new phoneno, confirm phoneno.
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -643,8 +682,8 @@ def admin_reset_phone_operation(request):
 				m=True 
 				return render_to_response('admin_user/reset_phone.html', {"m":m})			 
 				
-# admin_view_history() shows the previous history of the ATM card 					
 def admin_view_history(request):
+	## admin_view_history() shows the previous history of the ATM card 					
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -702,8 +741,9 @@ def admin_view_history(request):
 								
 			return render_to_response('admin_user/view_history.html', locals())	
 			
-# admin_update_date() reset the expiring date of the ATM card to further 4 years			
+			
 def admin_update_date(request):
+	##admin_update_date() displays the page from which admin can update the expiry date of card holder
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -712,8 +752,9 @@ def admin_update_date(request):
 		else:			
 			return render_to_response('admin_user/update_expiring_date.html', locals())
 			
-# admin_update_date_operation() update the expiring date in the database		
+		
 def admin_update_date_operation(request):
+	## admin_update_date_operation() update the expiring date in the database by 4 years
 	if 'login' not in request.session:
 		return render_to_response('admin_user/index.html', locals())
 	else:
@@ -728,6 +769,7 @@ def admin_update_date_operation(request):
 			return render_to_response('admin_user/update_card_details.html', locals())	
 
 def admin_logout(request):
+	##admin_logout() logsout the administrator and deletes the session.
 	for sesskey in request.session.keys():
 		del request.session[sesskey]
 	return render_to_response('admin_user/index.html', locals())
