@@ -81,6 +81,7 @@
           <div class="page-header">
             <h1>XYZ Bank ATM<small>    Its Complicated</small></h1>
           </div>
+          <p align="RIGHT">  <a href = "/admin_user/logout/" > LOGOUT</a></p><br>
           <div class="row">
             <div class="span10">
               <h3>Hello Admin</h3>
@@ -103,6 +104,9 @@
 					{% if match %}
 							<div class="alert-message info"><strong> PINCODE YOU ENTERED DOES NOT MATCH</strong></div>
 						{% endif %}
+					{% if m %}
+							<div class="alert-message info"><strong> PINCODE MUST BE OF 4 DIGIT INTEGER</strong></div>
+						{% endif %}	
     </div>
             </div>
             <div class="span4">
