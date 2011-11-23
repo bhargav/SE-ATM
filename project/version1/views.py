@@ -8,6 +8,7 @@ import datetime
 from django.core.context_processors import csrf
 from django.views.decorators.csrf import csrf_protect
 import sys
+import random
 @csrf_protect
 def index(request):
 	'''It displays the main page which includes the form which validates the cardnumber'''
@@ -49,7 +50,11 @@ def validatepin(request):
 		try:
 			cardpin = request.POST['pincode']         
 			if int(atmcard.pin) == int(cardpin):         
-				request.session['pinverified'] = True       
+				request.session['pinverified'] = True
+				if atmcard.two_factor:
+					request.session['passcode']=random.randint(1000,9999)
+					print request.session['passcode']
+					return redirect('/user/validatepasscode')       
 				return redirect('/user/options')
 			if 'pinattempt' not in request.session:
 				request.session['pinattempt'] = 1
@@ -83,6 +88,53 @@ def validatepin(request):
 	return render_to_response('finale/pincode.html', locals())
 
 @csrf_protect
+def validatepasscode(request):
+	'''It displays the page which includes the form which validates the user based on pincode if card is already verified'''
+	if 'cardnumber' not in request.session:  
+		return redirect('/user/')
+	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])	
+	if 'pinverified' in request.session and not atmcard.two_factor:       
+		return redirect('/user/options/')
+	if 'passcodeverified' in request.session:       
+		return redirect('/user/options/')
+	username = atmcard.name
+	request.session['username'] = username        
+	no = atmcard.phone_num
+	if request.method == 'POST': 
+		try:
+			passcode = request.POST['passcode']         
+			if int(request.session['passcode']) == int(passcode):         
+				request.session['passcodeverified'] = True       
+				return redirect('/user/options')
+			if 'passattempt' not in request.session:
+				request.session['passattempt'] = 1
+			else:
+				request.session['passattempt'] = request.session['passattempt'] + 1
+			
+			if request.session['passattempt'] == 1:
+					pinmessage = 1
+			elif request.session['passattempt'] == 2:
+					pinmessage = 2
+			else:
+					pinmessage = 3
+					request.session.flush()
+		except:
+			e = sys.exc_info()[1]
+			if 'passattempt' not in request.session:
+				request.session['passattempt'] = 1
+			else:
+				request.session['passattempt'] = request.session['passattempt'] + 1
+			if request.session['passattempt'] == 1:
+					pinmessage = 1
+			elif request.session['passattempt'] == 2:
+					pinmessage = 2
+			else:
+					pinmessage = 3
+					request.session.flush()	  			
+	return render_to_response('finale/passcode.html', locals())
+
+
+@csrf_protect
 def options(request):
 	'''displays the options available if user has been verified'''
 	if 'cardnumber' not in request.session:
@@ -101,7 +153,7 @@ def balanceenquiry(request):
 		return redirect('/user/pinvalidation/')	
 	atmcard = ATM_Card.objects.get(atmcard_num=request.session['cardnumber'])
 	t_acc = Account_Ext.objects.get(acc_num=str(atmcard.account_num))
-	t = Balance_Enquiry(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 1,type_trans = "Balance Enquiry",bal_amount=t_acc.balance)
+	t = Balance_Enquiry(atmcard_num = atmcard, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 1,type_trans = "Balance Enquiry",bal_amount=t_acc.balance)
 	t.save()
 	bal = t_acc.balance
 	username=atmcard.name
@@ -122,12 +174,12 @@ def cashwithdrawal(request):
 			if(Decimal(t_acc.balance)>Decimal(request.POST['amount'])):
 				t_acc.balance = t_acc.balance - Decimal(request.POST['amount'])
 				t_acc.save()
-				t = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['amount']),cur_bal=t_acc.balance)
+				t = Cash_Withdrawl(atmcard_num = atmcard, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['amount']),cur_bal=t_acc.balance)
 				t.save()
 				wdmessage = 1
 				request.session.flush()
 			else:
-				ta = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 11,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['amount']),cur_bal = t_acc.balance)
+				ta = Cash_Withdrawl(atmcard_num = atmcard, machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 11,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['amount']),cur_bal = t_acc.balance)
 				ta.save()
 				wdmessage = 2
 		except:
@@ -158,12 +210,12 @@ def cashtransfer(request):
 					t_acc.save()
 					acc_2[0].balance = acc_2[0].balance + Decimal(request.POST['amount'])
 					acc_2[0].save()
-					t = Cash_Transfer(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 3,type_trans = "Cash Transfer",amt_trans = Decimal(request.POST['amount']),ben_acc_num=accnum,ben_name=accname)
+					t = Cash_Transfer(atmcard_num = atmcard, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 3,type_trans = "Cash Transfer",amt_trans = Decimal(request.POST['amount']),ben_acc_num=accnum,ben_name=accname)
 					t.save()
 					ctmessage = 1
 					request.session.flush()
 				else:
-					ta = Cash_Transfer(atmcard_num_id = request.session['cardnumber'], machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 12,type_trans = "Cash Transfer",amt_trans = Decimal(request.POST['amount']),ben_acc_num=accnum,ben_name=accname)
+					ta = Cash_Transfer(atmcard_num = atmcard, machine_id_id =1, tid = 1, date_time = datetime.datetime.now(),status = "Not Completed",rescode = 12,type_trans = "Cash Transfer",amt_trans = Decimal(request.POST['amount']),ben_acc_num=accnum,ben_name=accname)
 					ta.save()
 					ctmessage = 2
 					request.session.flush()		
@@ -195,7 +247,7 @@ def pinchange(request):
 					else:
 						#successfull
 						pcmessage=4
-						t = Pin_change(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_pin=cardpin,new_pin=npin)
+						t = Pin_change(atmcard_num = atmcard, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_pin=cardpin,new_pin=npin)
 						t.save()
 						atmcard.pin=int(cpin)
 						atmcard.save() 
@@ -210,7 +262,8 @@ def pinchange(request):
 		except:
 			e = sys.exc_info()[1]
 			pcmessage=5			
-	return render_to_response('finale/pinchange.html', locals())
+	return render_to_response('finale/pinchange.html', locals())	
+
 
 @csrf_protect	
 def phonechange(request):
@@ -232,7 +285,7 @@ def phonechange(request):
 					else:
 						#successfull
 						pcmessage=4
-						t = Phone_change(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_phone=atmcard.phone_num,new_phone=nphone)
+						t = Phone_change(atmcard_num = atmcard, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 4,type_trans = "Pin Change",prev_phone=atmcard.phone_num,new_phone=nphone)
 						t.save()
 						atmcard.phone_num=int(cphone)
 						atmcard.save() 
@@ -261,7 +314,7 @@ def fastcash(request):
 			if(Decimal(t_acc.balance)>Decimal(request.POST['fcash'])):
 				t_acc.balance = t_acc.balance - Decimal(request.POST['fcash'])
 				t_acc.save()
-				t = Cash_Withdrawl(atmcard_num_id = request.session['cardnumber'], machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['fcash']),cur_bal=t_acc.balance)
+				t = Cash_Withdrawl(atmcard_num = atmcard, machine_id_id = 1,tid = 1,date_time = datetime.datetime.now(),status = "Completed",rescode = 2,type_trans = "Cash Withdrawal",amt_with = Decimal(request.POST['fcash']),cur_bal=t_acc.balance)
 				t.save()
 				fcmessage = 1
 				request.session.flush()
@@ -273,6 +326,35 @@ def fastcash(request):
 			e = sys.exc_info()[1]
 			fcmessage=3		
 	return render_to_response('finale/fastcash.html', locals())
+
+@csrf_protect
+def history(request):
+	'''displays the history of successfull transactions made by user'''
+	if 'cardnumber' not in request.session:
+		return redirect('/user/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')
+	username = request.session['username']
+	cardnum=request.session['cardnumber']
+	cashw=Cash_Withdrawl.objects.filter(atmcard_num=cardnum,rescode=2)
+	print cashw
+	casht=Cash_Transfer.objects.filter(atmcard_num=cardnum,rescode=3)
+	print casht
+	list_transaction=[]
+	
+	for e in cashw:
+		dict={}
+		dict['date'] = e.date_time
+		dict['tt'] = e.type_trans
+		dict['amount'] =e.amt_with
+		list_transaction.append(dict)
+	for e in casht:
+		dict={}
+		dict['date'] = e.date_time
+		dict['tt'] = e.type_trans
+		dict['amount'] =e.amt_trans
+		list_transaction.append(dict)	
+	return render_to_response('finale/history.html', locals())
 	
 @csrf_protect
 def exit(request):

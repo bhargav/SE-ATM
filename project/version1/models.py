@@ -111,7 +111,7 @@ class Account_Ext(models.Model):
 # phone_num ---> BigInteger
 # card_status ---> Boolean
 class ATM_Card(models.Model):
-	atmcard_num = models.BigIntegerField("ATM Card Number")
+	atmcard_num = models.BigIntegerField("ATM Card Number",primary_key=True)
 	account_num = models.ForeignKey(Account_Ext)
 	name = models.CharField("NAME ON CARD",max_length=100)
 	pin = models.IntegerField("PIN", max_length=4)
