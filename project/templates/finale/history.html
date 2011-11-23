@@ -63,7 +63,7 @@
     
      .actionsNew {
         padding-top : 10px;
-        padding-left : 60px;
+        padding-left : 165px;
         padding-bottom: 0px;
       }
       
@@ -88,35 +88,22 @@
               <h3>Hello {{ username }} !</h3>
             {% else %}
               <h3>Hello user !</h3>
-            {% endif %}
-              <p> Please choose the amount</p>
-              <div class="well">
-              {% if fcmessage == 1 %}
-              <div class="alert-message success"><p><strong>Your Transaction is SUCCESSFULL!</strong></p></div>
-              <script type="text/javascript">
-              $(document).ready(function() {
-                $('#fastcash').hide();
-                window.setTimeout('location.reload()', 5000);
-                });
-               </script> 
-              {% else %} {% if fcmessage == 2 %}
-              <div class="alert-message error"><p><strong>Transaction UNSUCCESSFULL!!</strong> You donot have enough money</p></div>
-               {% else %} {% if fcmessage == 3 %}
-              <div class="alert-message error"><p><strong>YOU HAVEN'T SELECTED ANY OPTION!!</strong></p></div>
-              {% endif %} 
-              {% endif %} {% endif %}
-              <form name="fastcash" id="fastcash" action="." method="post">{% csrf_token %}
-              1000  <input type = "radio" name = "fcash" value = "1000" id = "fcash"/>
-			  2000  <input type = "radio" name = "fcash" value = "2000" id = "fcash"/>
-		      5000  <input type = "radio" name = "fcash" value = "5000" id = "fcash"/>
-		      10000 <input type = "radio" name = "fcash" value = "10000" id = "fcash"/>
+            {% endif %}  
+              <p> YOUR HISTORY IS </p> 
+              <table class="zebra-striped">
+			  {%if list_transaction%}
+			  <tr><td><h4>DATE</h4></td><td><h4>TRANSACTION TYPE</h4></td><td><h4>AMOUNT</h4></td></td></tr>
+              {%for t in list_transaction%}
+              <tr><td>{{t.date}}</td><td>{{t.tt}}</td><td>{{t.amount}}</td></tr>
+              {%endfor%}
+              {%else%}
+              <div class="alert-message error"><p><strong>THERE ARE NO TRANSACTIONS</strong></p></div>
+              {%endif%}
+              </table>
               <div class="actionsNew">
-				<button type="button" id="Back" value="BACK" class="btn primary disabled" onclick="location.href='/user/options/'"> BACK </button>  
-                <input type="submit" class="btn primary disabled" value="NEXT" />
-              </div>
-              </form>
-
-              </div>
+			  <button type="button" id="More" value="More" class="btn primary disabled" onclick="location.href='/user/options/'"> More </button>	  
+              <button type="button" id="Exit" value="Exit" class="btn primary disabled" onclick="location.href='/user/exit/'"> Exit </button>
+              </div>       
             </div>
             <div class="span4">
               <h3>Secondary content</h3>
