@@ -44,7 +44,8 @@ def validatepin(request):
 	if request.method == 'POST':                 
 		cardpin = request.POST['pincode']         
 		if int(atmcard.pin) == int(cardpin):         
-			request.session['pinverified'] = True       
+			request.session['pinverified'] = True
+			request.session.set_expiry(300)
 			return redirect('/user/options')
 		if 'pinattempt' not in request.session:
 			request.session['pinattempt'] = 1
@@ -69,6 +70,7 @@ def options(request):
 		return redirect('/user/')
 	if 'pinverified' not in request.session:
 		return redirect('/user/pinvalidation/')
+	print request.session.get_expiry_age()
 	username = request.session['username']
 	return render_to_response('finale/options.html', locals())
 

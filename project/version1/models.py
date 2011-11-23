@@ -111,7 +111,7 @@ class Account_Ext(models.Model):
 # phone_num ---> BigInteger
 # card_status ---> Boolean
 class ATM_Card(models.Model):
-	atmcard_num = models.BigIntegerField("ATM Card Number")
+	atmcard_num = models.BigIntegerField("ATM Card Number", primary_key=True)
 	account_num = models.ForeignKey(Account_Ext)
 	name = models.CharField("NAME ON CARD",max_length=100)
 	pin = models.IntegerField("PIN", max_length=4)
@@ -125,6 +125,8 @@ class ATM_Card(models.Model):
 		return str(self.atmcard_num)
 
 	def save(self, *args, **kwargs):
+		if Account_Ext.objects.filter(acc_num = self.account_num_id).count() == 0:
+			raise Exception, "Account does not exist"
 		if(self.atmcard_num > 0):
 			if(len(str(self.atmcard_num)) == 4):
 				if(self.pin <= 0):
