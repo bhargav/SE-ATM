@@ -1,6 +1,8 @@
 from django.test import TestCase, Client
 from version1.models import *
+import simplejson as json
 import datetime
+import urllib
 
 class MachineTestCase(TestCase):
 	def setUp(self):
@@ -132,25 +134,68 @@ class ATMCardTestCase(TestCase):
 		t = ATM_Card.objects.all()[0]
 		t.phone_num = 1234
 		self.assertRaises(Exception, t.save)
-	
+
 class ViewsTestCase(TestCase):
 	def setUp(self):
+		self.url = 'http://localhost:8000/'
 		self.client = Client()
 		self.machine = Machine(1,"Delhi", 500.00, 10000.00, datetime.datetime.now(), datetime.datetime(2012, 2, 2))
 		self.machine.save()
 		self.account_ext = t = Account_Ext(123456789012, "M", 9646818259, 100.00)
 		self.account_ext.save()
-		self.atmcard = self.data = ATM_Card(account_num=self.account_ext, atmcard_num = 2311, name="M", pin=1234, date_of_issue=datetime.datetime.now(), expiry_date=datetime.datetime(2012, 11, 10, 12, 00), address="12 B, New Delhi", two_factor=False, phone_num=9646818259, card_status=True)
+		self.atmcard = ATM_Card(account_num=self.account_ext, atmcard_num = 2311, name="M", pin=1234, date_of_issue=datetime.datetime.now(), expiry_date=datetime.datetime(2012, 11, 10, 12, 00), address="12 B, New Delhi", two_factor=False, phone_num=9646818259, card_status=True)
 		self.atmcard.save()
 	
 	def testViews_invalidPages(self):
-		invalidPages_initial = ['/user/validatepin', '/user/validatepasscode', '/user/options', '/user/history', '/user/balanceenquiry', '/user/cashwithdrawal', '/user/cashtransfer', '/user/pinchange', '/user/phonechange', '/user/fastcash']
+		invalidPages_initial = ['/user/card/', '/user/validatepin', '/user/validatepasscode', '/user/options', '/user/history', '/user/balanceenquiry', '/user/cashwithdrawal', '/user/cashtransfer', '/user/pinchange', '/user/phonechange', '/user/fastcash']
 		for page in invalidPages_initial:
 			response = self.client.post(page)
 			self.assertIn(response.status_code, [301, 302])
-
-
+	
 class APITestCase(TestCase):
 	def setUp(self):
-		self.url = 'http://localhost:8000/api/v1/'
+		self.url = '/api/v1/'
+		self.client = Client()
+		self.fields = {'format': 'json'}
 
+	def testAPI_cashwithdrawal(self):
+		url = self.url + 'cashwithdrawal/'
+		res = self.client.get(url + '?' + urllib.urlencode(self.fields))
+		response = json.loads(res.content)
+		self.assertEqual(response["meta"]["total_count"], 0)
+
+	def testAPI_cashtransfer(self):
+		url = self.url + 'cashtransfer/'
+		res = self.client.get(url + '?' + urllib.urlencode(self.fields))
+		response = json.loads(res.content)
+		self.assertEqual(response["meta"]["total_count"], 0)
+
+		Account_Ext(121212121212, "S", 9023043521, 500.00).save()
+		acc = Account_Ext(123456789012, "M", 9646818259, 1000.00)
+		acc.save()
+		atmcard = ATM_Card(account_num=acc, atmcard_num = 2311, name="M", pin=1234, date_of_issue=datetime.datetime.now(), expiry_date=datetime.datetime(2012, 11, 10, 12, 00), address="12 B, New Delhi", two_factor=False, phone_num=9646818259, card_status=True)
+		atmcard.save()
+		machine = Machine(1,"Delhi", 500.00, 10000.00, datetime.datetime.now(), datetime.datetime(2012, 2, 2))
+		machine.save()
+		cash = Cash_Transfer(ben_acc_num=121212121212, ben_name="S", amt_trans=125.00, tid = 10, rescode = 3, atmcard_num = atmcard, machine_id = machine, date_time = datetime.datetime.now())
+		cash.save()
+
+		res = self.client.get(url + '?' + urllib.urlencode(self.fields))
+		response = json.loads(res.content)
+		self.assertEqual(response["meta"]["total_count"], 1)
+		self.assertEqual(len(response["objects"]), 1)
+		self.assertEqual(response["objects"][0]["amt_trans"], 125.00)
+
+	def testAPI_atmcard(self):
+		url = self.url + 'atmcard/'
+		res = self.client.get(url + '?' + urllib.urlencode(self.fields))
+		response = json.loads(res.content)
+		self.assertEqual(response["meta"]["total_count"], 0)
+		
+		acc = Account_Ext(123456789012, "M", 9646818259, 1000.00)
+		acc.save()
+		ATM_Card(account_num=acc, atmcard_num = 2311, name="M", pin=1234, date_of_issue=datetime.datetime.now(), expiry_date=datetime.datetime(2012, 11, 10, 12, 00), address="12 B, New Delhi", two_factor=False, phone_num=9646818259, card_status=True).save()
+		res = self.client.get(url + '?' + urllib.urlencode(self.fields))
+		response = json.loads(res.content)
+		self.assertEqual(response["meta"]["total_count"], 1)
+						
