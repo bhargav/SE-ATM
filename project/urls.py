@@ -13,7 +13,8 @@ v1_api.register(ServicesResource())
 v1_api.register(ATMCardResource())
 
 urlpatterns = patterns('',
-    url(r'^user/$', 'version1.views.index'),
+    url(r'^user/$', 'version1.views.main'),
+    url(r'^user/card/$', 'version1.views.index'), 
     url(r'^user/validatepin/$', 'version1.views.validatepin'),
     url(r'^user/validatepasscode/$', 'version1.views.validatepasscode'),
     url(r'^user/options/$', 'version1.views.options'),
