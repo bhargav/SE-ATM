@@ -113,8 +113,44 @@ class ATMCardTestCase(TestCase):
 		self.assertEqual(ATM_Card.objects.all().count(), 1)
 		self.assertEqual(ATM_Card.objects.all()[0].pin, 1212)
 	
-	def testATMCard_invalidFields(self)
+	def testATMCard_invalidFields(self):
 		t = ATM_Card.objects.all()[0]
-		
+		t.pin = 12
+		self.assertRaises(Exception, t.save)
 
+		self.assertEqual(ATM_Card.objects.all().count(), 1)
+		t = ATM_Card.objects.all()[0]
+		t.atmcard_num = -1234
+		self.assertRaises(Exception, t.save)
+
+		self.assertEqual(ATM_Card.objects.all().count(), 1)
+		t = ATM_Card.objects.all()[0]
+		t.atmcard_num = 'ABC'
+		self.assertRaises(Exception, t.save)
+
+		self.assertEqual(ATM_Card.objects.all().count(), 1)
+		t = ATM_Card.objects.all()[0]
+		t.phone_num = 1234
+		self.assertRaises(Exception, t.save)
+	
+class ViewsTestCase(TestCase):
+	def setUp(self):
+		self.client = Client()
+		self.machine = Machine(1,"Delhi", 500.00, 10000.00, datetime.datetime.now(), datetime.datetime(2012, 2, 2))
+		self.machine.save()
+		self.account_ext = t = Account_Ext(123456789012, "M", 9646818259, 100.00)
+		self.account_ext.save()
+		self.atmcard = self.data = ATM_Card(account_num=self.account_ext, atmcard_num = 2311, name="M", pin=1234, date_of_issue=datetime.datetime.now(), expiry_date=datetime.datetime(2012, 11, 10, 12, 00), address="12 B, New Delhi", two_factor=False, phone_num=9646818259, card_status=True)
+		self.atmcard.save()
+	
+	def testViews_invalidPages(self):
+		invalidPages_initial = ['/user/validatepin', '/user/validatepasscode', '/user/options', '/user/history', '/user/balanceenquiry', '/user/cashwithdrawal', '/user/cashtransfer', '/user/pinchange', '/user/phonechange', '/user/fastcash']
+		for page in invalidPages_initial:
+			response = self.client.post(page)
+			self.assertIn(response.status_code, [301, 302])
+
+
+class APITestCase(TestCase):
+	def setUp(self):
+		self.url = 'http://localhost:8000/api/v1/'
 
