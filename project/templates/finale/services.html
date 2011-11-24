@@ -88,25 +88,19 @@
               <h3>Hello {{ username }} !</h3>
             {% else %}
               <h3>Hello user !</h3>
-            {% endif %}  
-              <p> Please <strong>choose</strong> one of the following options</p>
+            {% endif %} 
+            {% if services %} 
+              <p> Your account has been registered with the following services</p>
               <div class="row">
-                
-                <div class="span5">
-                <a href="/user/balanceenquiry"><div class="alert-message block-message warning"><h3>BALANCE ENQUIRY</h3></div></a>
-                <a href="/user/fastcash"><div class="alert-message block-message info"><h3>FAST CASH</h3></div></a>                                
-                <a href="/user/cashwithdrawal"><div class="alert-message block-message info"><h3>CASH WITHDRAWAL</h3></div></a>
-                <a href="/user/cashtransfer"><div class="alert-message block-message info"><h3>CASH TRANSFER</h3></div></a>
-                <a href="/user/services"><div class="alert-message block-message error"><h3>SERVICES</h3></div></a>                
-                </div>
-
-                <div class="span5">
-                <a href="/user/pinchange"><div class="alert-message block-message success"><h3>PIN CHANGE</h3></div></a>
-                <a href="/user/phonechange"><div class="alert-message block-message success"><h3>PHONE CHANGE</h3></div></a>                                
-                <a href="/user/history"><div class="alert-message block-message success"><h3>HISTORY</h3></div></a>
-                <a href="/user/exit"><div class="alert-message block-message error"><h3>EXIT</h3></div></a>
-                </div>
+                <form name="input" id="pinform" action="." method="post">{% csrf_token %}
+              {% for m in serviceslist %}
+                    <input type="text" class="span2" name="{{ m }}" id="{{ m }}"/>
+              {% endfor %}
+              </form>
               </div>
+            {% else %} 
+            <div class="alert-message info">Your account has not been registered with any service. You have to register with services to utilize this facility. Please login to the bank website and register to services using your account number and login credentials</div> 
+            {% endif %}
             </div>
             <div class="span4">
               <h3>Secondary content</h3>

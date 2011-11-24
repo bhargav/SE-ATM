@@ -12,6 +12,8 @@ import random
 from django.db.models import Avg, Max, Min, Count
 from dateutil.relativedelta import relativedelta
 import sms
+from lxml import etree
+import urllib
 
 ##To select the machine
 ##@param: machineid
@@ -22,7 +24,9 @@ def main(request):
 		return redirect('/user/validatepin/')  
 	if 'pinverified' in request.session:
 		return redirect('/user/options/')
-		machinelist = Machine.objects.all()
+	machinelist = Machine.objects.all()
+	if len(machinelist) > 0:
+		machinelistpresent = True
 	if request.method == 'POST':
 		print request.POST['m']
 		request.session['machine'] = request.POST['m']
@@ -415,6 +419,54 @@ def history(request):
 		dict['amount'] =e.amt_trans
 		list_transaction.append(dict)	
 	return render_to_response('finale/history.html', locals())
+
+def services_mock_listBiller(request):
+	r = etree.Element('BankServices')
+	billers = etree.SubElement(r, 'Billers')
+	
+	b1 = etree.SubElement(billers, 'Biller', category="MutualFunds")
+	etree.SubElement(b1, 'name').text = "LIC"
+	etree.SubElement(b1, 'account_id').text = "201"
+	
+	b1 = etree.SubElement(billers, 'Biller', category="Water")
+	etree.SubElement(b1, 'name').text = "Delhi Jal Board"
+	etree.SubElement(b1, 'account_id').text = "202" 
+
+	b1 = etree.SubElement(billers, 'Biller', category="Telephone")
+	etree.SubElement(b1, 'name').text = "Airtel"
+	etree.SubElement(b1, 'account_id').text = "203"
+
+	b1 = etree.SubElement(billers, 'Biller', category="Telephone")
+	etree.SubElement(b1, 'name').text = "MTNL"
+	etree.SubElement(b1, 'account_id').text = "204"
+
+	b1 = etree.SubElement(billers, 'Biller', category="Exam")
+	etree.SubElement(b1, 'name').text = "GATE"
+	etree.SubElement(b1, 'account_id').text = "205"
+
+	b1 = etree.SubElement(billers, 'Biller', category="Electricity")
+	etree.SubElement(b1, 'name').text = "Delhi Electricity Board"
+	etree.SubElement(b1, 'account_id').text = "206"
+
+	b1 = etree.SubElement(billers, 'Biller', category="Exam")
+	etree.SubElement(b1, 'name').text = "IIT JEE"
+	etree.SubElement(b1, 'account_id').text = "207"
+
+	return HttpResponse(etree.tostring(r), mimetype="text/xml")
+
+@csrf_protect
+def services(request):
+	if 'machine' not in request.session:
+		return redirect('/user/')
+	if 'cardnumber' not in request.session:
+		return redirect('/user/card/')
+	if 'pinverified' not in request.session:
+		return redirect('/user/pinvalidation/')	
+	r = urllib.urlopen('http://localhost:8000/BankServices/rest/biller')
+	print r.read()
+	serv = etree.parse(r.read())	
+	serviceslist = root.iter()
+	return render_to_response('finale/services.html', locals())
 
 ##To delete the session.
 ##@param: 'request' stores which form method we are using i.e(GET/POST) and session variable

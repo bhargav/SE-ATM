@@ -86,7 +86,7 @@
               <h3>Hello user!</h3>
               <p> Please select the ATM  and press 'NEXT'</p>
               <div class="well">
-          {% if machinelist %}
+          {% if machinelistpresent %}
 					<form name="input" action="." method="post">{% csrf_token %}
 						<label for="xlInput">MACHINE &nbsp;</label> 
 							<select name="m" class="span3" id="m" >
