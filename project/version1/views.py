@@ -22,13 +22,12 @@ def main(request):
 		return redirect('/user/validatepin/')  
 	if 'pinverified' in request.session:
 		return redirect('/user/options/')
-	machinelist = Machine.objects.all()
+		machinelist = Machine.objects.all()
 	if request.method == 'POST':
 		print request.POST['m']
 		request.session['machine'] = request.POST['m']
 		return redirect('/user/card/')   
 	return render_to_response('finale/main.html',locals())
-
 
 @csrf_protect
 def index(request):
