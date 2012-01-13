@@ -1,7 +1,7 @@
 import unicodedata
 import urllib
 
-url = 'http://ubaid.tk/sms/sms.aspx?uid=9646818259&pwd=kronos&phone=%s&msg=%s&provider=way2sms'
+url = 'http://ubaid.tk/sms/sms.aspx?uid=&pwd=&phone=%s&msg=%s&provider=way2sms'
 
 def sendSMS(number, message):
 	number = unicodedata.normalize('NFKD', unicode(number)).encode('ASCII', 'ignore')
